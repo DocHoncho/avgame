@@ -44,3 +44,4 @@ yarn-error.log*
 
 # System Files
 Thumbs.db
+.yarn/install-state.gz
