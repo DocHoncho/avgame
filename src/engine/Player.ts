@@ -63,17 +63,29 @@ export class Player {
   /**
    * Transform input axes based on camera rotation
    * This makes WASD movement relative to the camera view
+   * W always moves in the direction the camera is facing
    */
   private transformInputAxes(inputX: number, inputY: number): { x: number, z: number } {
     // Get the camera rotation angle
     const renderer = getRenderer();
     const cameraAngle = renderer.camera.getRotationAngle();
 
-    // Apply rotation matrix to input axes
-    const cos = Math.cos(cameraAngle);
-    const sin = Math.sin(cameraAngle);
+    // For our control scheme:
+    // - W (inputY = 1) should move in the direction the camera is facing
+    // - A (inputX = -1) should move left relative to camera
+    // - S (inputY = -1) should move backward relative to camera
+    // - D (inputX = 1) should move right relative to camera
 
-    // Rotate the input vector by the camera angle
+    // Adjust the input axes to align with camera direction
+    // We need to rotate the input vector by the camera angle + 90 degrees (PI/2)
+    // because in our camera setup, 0 degrees is east, but we want 0 to be the camera's forward direction
+    const adjustedAngle = cameraAngle - Math.PI / 2;
+
+    // Apply rotation matrix to input axes
+    const cos = Math.cos(adjustedAngle);
+    const sin = Math.sin(adjustedAngle);
+
+    // Rotate the input vector by the adjusted angle
     const transformedX = inputX * cos - inputY * sin;
     const transformedZ = inputX * sin + inputY * cos;
 
