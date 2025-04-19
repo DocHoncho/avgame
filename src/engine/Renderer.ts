@@ -179,6 +179,12 @@ export class Renderer {
     // Add a grid helper for reference (centered at origin)
     const gridHelper = new THREE.GridHelper(this.roomSize, this.roomSize);
     this.scene.add(gridHelper);
+
+    // Add axis helper to visualize world coordinates
+    // Red = X axis, Green = Y axis, Blue = Z axis
+    const axisHelper = new THREE.AxesHelper(5);
+    axisHelper.position.set(0, 0.1, 0); // Slightly above ground
+    this.scene.add(axisHelper);
   }
 
   /**

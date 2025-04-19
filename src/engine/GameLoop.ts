@@ -49,20 +49,41 @@ export function initGameEngine() {
     }
 
     // Snap camera rotation with Q and E keys
-    if (e.key === 'q') {
+    if (e.key === 'q' || e.key === 'e') {
       const renderer = getRenderer();
-      // Rotate to the next cardinal direction counter-clockwise
       const currentAngle = renderer.camera.getRotationAngle();
-      const cardinalIndex = Math.round((Math.PI - currentAngle) / (Math.PI / 2)) % 4;
-      const nextCardinalIndex = (cardinalIndex + 1) % 4;
-      renderer.camera.snapToCardinal(nextCardinalIndex);
-    } else if (e.key === 'e') {
-      const renderer = getRenderer();
-      // Rotate to the next cardinal direction clockwise
-      const currentAngle = renderer.camera.getRotationAngle();
-      const cardinalIndex = Math.round((Math.PI - currentAngle) / (Math.PI / 2)) % 4;
-      const nextCardinalIndex = (cardinalIndex + 3) % 4; // +3 is equivalent to -1 in modulo 4
-      renderer.camera.snapToCardinal(nextCardinalIndex);
+
+      // Determine current cardinal direction
+      // East = 0, North = PI/2, West = PI, South = 3PI/2
+      let currentCardinal = 0; // Default to East
+
+      // Find the closest cardinal direction
+      const normalizedAngle = ((currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      if (normalizedAngle >= Math.PI * 0.25 && normalizedAngle < Math.PI * 0.75) {
+        currentCardinal = 0; // North
+      } else if (normalizedAngle >= Math.PI * 0.75 && normalizedAngle < Math.PI * 1.25) {
+        currentCardinal = 3; // West
+      } else if (normalizedAngle >= Math.PI * 1.25 && normalizedAngle < Math.PI * 1.75) {
+        currentCardinal = 2; // South
+      } else {
+        currentCardinal = 1; // East
+      }
+
+      // Calculate next cardinal direction
+      let nextCardinal;
+      if (e.key === 'q') {
+        // Counter-clockwise: North -> West -> South -> East -> North
+        nextCardinal = (currentCardinal + 3) % 4; // +3 is equivalent to -1 in modulo 4
+      } else { // e.key === 'e'
+        // Clockwise: North -> East -> South -> West -> North
+        nextCardinal = (currentCardinal + 1) % 4;
+      }
+
+      // Snap to the next cardinal direction
+      renderer.camera.snapToCardinal(nextCardinal);
+
+      // Debug output
+      console.log(`Rotating from ${['North', 'East', 'South', 'West'][currentCardinal]} to ${['North', 'East', 'South', 'West'][nextCardinal]}`);
     }
   });
 }

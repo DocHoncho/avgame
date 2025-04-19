@@ -76,6 +76,7 @@
 - **2025-04-19:** Fixed movement controls to ensure W always moves in the direction the camera is facing
 - **2025-04-19:** Added compass indicator to DevOverlay to show camera orientation
 - **2025-04-19:** Fixed camera-relative movement to properly align with camera direction
+- **2025-04-19:** Added axis helper and improved compass indicator for better debugging
 
 ---
 
