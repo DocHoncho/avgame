@@ -77,18 +77,18 @@ export class Player {
     // - D (inputX = 1) should move right relative to camera
 
     // In Three.js, the camera rotation works as follows (based on our coordinate system):
-    // - PI radians: Camera looks north (-X axis)
-    // - PI/2 radians: Camera looks east (+Z axis)
-    // - 0 radians: Camera looks south (+X axis)
-    // - 3PI/2 radians: Camera looks west (-Z axis)
+    // - PI/2 radians: Camera looks north (-Z axis)
+    // - 0 radians: Camera looks east (+X axis)
+    // - 3PI/2 radians: Camera looks south (+Z axis)
+    // - PI radians: Camera looks west (-X axis)
 
     // We need to map our WASD inputs to the world coordinates based on camera angle
     // First, we'll determine the forward and right vectors based on camera angle
-    const forwardX = -Math.cos(cameraAngle); // X component of forward vector
-    const forwardZ = Math.sin(cameraAngle);  // Z component of forward vector
+    const forwardX = Math.sin(cameraAngle);  // X component of forward vector
+    const forwardZ = -Math.cos(cameraAngle); // Z component of forward vector
 
-    const rightX = -Math.sin(cameraAngle);   // X component of right vector
-    const rightZ = -Math.cos(cameraAngle);   // Z component of right vector
+    const rightX = Math.cos(cameraAngle);    // X component of right vector
+    const rightZ = Math.sin(cameraAngle);    // Z component of right vector
 
     // Now combine the forward and right vectors based on input
     // Forward/backward movement (W/S) uses the forward vector

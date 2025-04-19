@@ -58,13 +58,13 @@ export function initGameEngine() {
       let currentCardinal = 0; // Default to East
 
       // Find the closest cardinal direction based on our coordinate system
-      // North = PI, East = PI/2, South = 0, West = 3PI/2
+      // North = PI/2, East = 0, South = 3PI/2, West = PI
       const normalizedAngle = ((currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-      if (normalizedAngle >= Math.PI * 0.75 && normalizedAngle < Math.PI * 1.25) {
+      if (normalizedAngle >= Math.PI * 0.25 && normalizedAngle < Math.PI * 0.75) {
         currentCardinal = 0; // North
-      } else if (normalizedAngle >= Math.PI * 0.25 && normalizedAngle < Math.PI * 0.75) {
-        currentCardinal = 1; // East
       } else if (normalizedAngle < Math.PI * 0.25 || normalizedAngle >= Math.PI * 1.75) {
+        currentCardinal = 1; // East
+      } else if (normalizedAngle >= Math.PI * 1.25 && normalizedAngle < Math.PI * 1.75) {
         currentCardinal = 2; // South
       } else {
         currentCardinal = 3; // West

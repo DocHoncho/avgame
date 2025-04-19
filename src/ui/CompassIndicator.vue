@@ -36,19 +36,19 @@ const direction = computed(() => {
   const normalizedAngle = ((angle.value % 360) + 360) % 360;
 
   if (normalizedAngle >= 337.5 || normalizedAngle < 22.5) {
-    return 'South';
+    return 'East';
   } else if (normalizedAngle >= 22.5 && normalizedAngle < 67.5) {
-    return 'South-West';
+    return 'North-East';
   } else if (normalizedAngle >= 67.5 && normalizedAngle < 112.5) {
-    return 'West';
+    return 'North';
   } else if (normalizedAngle >= 112.5 && normalizedAngle < 157.5) {
     return 'North-West';
   } else if (normalizedAngle >= 157.5 && normalizedAngle < 202.5) {
-    return 'North';
+    return 'West';
   } else if (normalizedAngle >= 202.5 && normalizedAngle < 247.5) {
-    return 'North-East';
+    return 'South-West';
   } else if (normalizedAngle >= 247.5 && normalizedAngle < 292.5) {
-    return 'East';
+    return 'South';
   } else {
     return 'South-East';
   }
@@ -59,11 +59,11 @@ function getCardinalDirection() {
   const normalizedAngle = ((angle.value % 360) + 360) % 360;
 
   // Determine which cardinal direction is closest
-  if (normalizedAngle >= 135 && normalizedAngle < 225) {
+  if (normalizedAngle >= 45 && normalizedAngle < 135) {
     return 'North';
-  } else if (normalizedAngle >= 225 && normalizedAngle < 315) {
-    return 'East';
   } else if (normalizedAngle >= 315 || normalizedAngle < 45) {
+    return 'East';
+  } else if (normalizedAngle >= 225 && normalizedAngle < 315) {
     return 'South';
   } else {
     return 'West';
