@@ -20,9 +20,10 @@ export class Renderer {
   private directionalLight: THREE.DirectionalLight;
 
   // Tile grid
-  private tileInstances: THREE.InstancedMesh | null = null;
+  private floorInstances: THREE.InstancedMesh | null = null;
+  private wallInstances: THREE.InstancedMesh | null = null;
   private tileSize = 1.0;
-  private gridSize = 16; // 16x16 test grid
+  private roomSize = 12; // 12x12 room with 1-tile wall border
 
   // Performance monitoring
   private stats = {
@@ -48,7 +49,10 @@ export class Renderer {
 
     // Create camera
     this.camera = new IsoCamera(50, window.innerWidth / window.innerHeight);
-    this.camera.setTarget(this.gridSize / 2, 0, this.gridSize / 2);
+    this.camera.setTarget(this.roomSize / 2, 0, this.roomSize / 2);
+
+    // Set initial camera distance for better view
+    this.camera.setDistance(18);
 
     // Add lights
     this.ambientLight = new THREE.AmbientLight(0x333333);
@@ -81,55 +85,99 @@ export class Renderer {
    * Create a test grid of instanced tiles
    */
   private createTestGrid() {
-    // Create a simple tile geometry
-    const tileGeometry = new THREE.BoxGeometry(this.tileSize, 0.2, this.tileSize);
+    // Create floor tile geometry (slightly thinner)
+    const floorGeometry = new THREE.BoxGeometry(this.tileSize, 0.1, this.tileSize);
 
-    // Create material with edge glow effect
-    const tileMaterial = new THREE.MeshStandardMaterial({
-      color: 0x00aaff,
+    // Create wall geometry (taller)
+    const wallGeometry = new THREE.BoxGeometry(this.tileSize, 1.0, this.tileSize);
+
+    // Create floor material with edge glow effect
+    const floorMaterial = new THREE.MeshStandardMaterial({
+      color: 0x005588,
+      emissive: 0x001122,
+      metalness: 0.7,
+      roughness: 0.3
+    });
+
+    // Create wall material with different color
+    const wallMaterial = new THREE.MeshStandardMaterial({
+      color: 0x0088cc,
       emissive: 0x003366,
       metalness: 0.8,
       roughness: 0.2
     });
 
-    // Create instanced mesh for the grid
-    this.tileInstances = new THREE.InstancedMesh(
-      tileGeometry,
-      tileMaterial,
-      this.gridSize * this.gridSize
+    // Calculate total tiles needed
+    const totalFloorTiles = (this.roomSize - 2) * (this.roomSize - 2); // Interior floor
+    const totalWallTiles = (this.roomSize * this.roomSize) - totalFloorTiles; // Outer walls
+
+    // Create instanced meshes
+    this.floorInstances = new THREE.InstancedMesh(
+      floorGeometry,
+      floorMaterial,
+      totalFloorTiles
     );
-    this.tileInstances.castShadow = true;
-    this.tileInstances.receiveShadow = true;
+    this.floorInstances.castShadow = false;
+    this.floorInstances.receiveShadow = true;
 
-    // Position each instance
+    this.wallInstances = new THREE.InstancedMesh(
+      wallGeometry,
+      wallMaterial,
+      totalWallTiles
+    );
+    this.wallInstances.castShadow = true;
+    this.wallInstances.receiveShadow = true;
+
+    // Position matrix
     const matrix = new THREE.Matrix4();
-    let index = 0;
 
-    for (let x = 0; x < this.gridSize; x++) {
-      for (let z = 0; z < this.gridSize; z++) {
-        // Checkerboard pattern for testing
-        const isEven = (x + z) % 2 === 0;
-        const height = isEven ? 0 : 0.5;
+    // Place floor tiles (interior)
+    let floorIndex = 0;
+    for (let x = 1; x < this.roomSize - 1; x++) {
+      for (let z = 1; z < this.roomSize - 1; z++) {
+        // Center the room at origin
+        const posX = (x - this.roomSize / 2) * this.tileSize;
+        const posZ = (z - this.roomSize / 2) * this.tileSize;
 
-        matrix.setPosition(x * this.tileSize, height, z * this.tileSize);
-        this.tileInstances.setMatrixAt(index, matrix);
+        matrix.setPosition(posX, 0, posZ);
+        this.floorInstances.setMatrixAt(floorIndex, matrix);
 
-        // Set color based on position
-        const color = new THREE.Color(
-          0.3 + (x / this.gridSize) * 0.7,
-          0.2,
-          0.3 + (z / this.gridSize) * 0.7
-        );
-        this.tileInstances.setColorAt(index, color);
+        // Set uniform color for floor
+        const floorColor = new THREE.Color(0x005588);
+        this.floorInstances.setColorAt(floorIndex, floorColor);
 
-        index++;
+        floorIndex++;
       }
     }
 
-    this.scene.add(this.tileInstances);
+    // Place wall tiles (perimeter)
+    let wallIndex = 0;
+    for (let x = 0; x < this.roomSize; x++) {
+      for (let z = 0; z < this.roomSize; z++) {
+        // Only place walls on the perimeter
+        if (x === 0 || x === this.roomSize - 1 || z === 0 || z === this.roomSize - 1) {
+          // Center the room at origin
+          const posX = (x - this.roomSize / 2) * this.tileSize;
+          const posZ = (z - this.roomSize / 2) * this.tileSize;
 
-    // Add a grid helper for reference
-    const gridHelper = new THREE.GridHelper(this.gridSize, this.gridSize);
+          matrix.setPosition(posX, 0.5, posZ); // Walls are centered at y=0.5
+          this.wallInstances.setMatrixAt(wallIndex, matrix);
+
+          // Set uniform color for walls
+          const wallColor = new THREE.Color(0x0088cc);
+          this.wallInstances.setColorAt(wallIndex, wallColor);
+
+          wallIndex++;
+        }
+      }
+    }
+
+    // Add instances to scene
+    this.scene.add(this.floorInstances);
+    this.scene.add(this.wallInstances);
+
+    // Add a grid helper for reference (centered at origin)
+    const gridHelper = new THREE.GridHelper(this.roomSize, this.roomSize);
     this.scene.add(gridHelper);
   }
 

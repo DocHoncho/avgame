@@ -14,8 +14,8 @@ let isRunning = false;
 let lastTime = 0;
 let accumulator = 0;
 
-// Auto-rotation for demo
-let autoRotate = true;
+// Auto-rotation for demo (disabled by default now that we have player movement)
+let autoRotate = false;
 const ROTATION_SPEED = 0.005;
 
 /**

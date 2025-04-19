@@ -35,6 +35,7 @@
 | **Aim Indicator** | ✅ Complete | Visual indicator showing aim direction |
 | **Camera Follow** | ✅ Complete | Camera follows player position |
 | **Physics & Continuous Collision** | 🔄 In Progress | Basic physics implemented, collision detection in progress |
+| **World Layout** | ✅ Complete | Simple square room with wall perimeter instead of checkerboard pattern |
 | **ECS Integration** | ⏳ Planned | Will implement after collision system |
 
 ---
@@ -69,6 +70,7 @@
 
 - **2025-04-19:** Initial project setup completed with Phase 0 and Phase 1 implementation
 - **2025-04-19:** Decided to use XState for state management due to its robust features and dev tools
+- **2025-04-19:** Updated world layout to use a simple square room with walls instead of offset checkerboard pattern
 
 ---
 

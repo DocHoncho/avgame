@@ -2,33 +2,33 @@ import * as THREE from 'three';
 
 /**
  * IsoCamera
- * 
+ *
  * Specialized camera for isometric view with rotation and zoom controls.
  * Maintains a fixed 3/4 perspective angle.
  */
 export class IsoCamera {
   // The actual Three.js camera
   public camera: THREE.PerspectiveCamera;
-  
+
   // Camera target (what we're looking at)
   private target = new THREE.Vector3(0, 0, 0);
-  
+
   // Camera position in spherical coordinates
   private distance = 20;
   private rotationAngle = Math.PI / 4; // 45 degrees
   private elevationAngle = Math.PI / 6; // 30 degrees
-  
+
   // Camera limits
   private minDistance = 10;
   private maxDistance = 50;
   private minElevation = Math.PI / 12; // 15 degrees
   private maxElevation = Math.PI / 3;  // 60 degrees
-  
+
   constructor(fov = 50, aspect = 1, near = 0.1, far = 1000) {
     this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
     this.updatePosition();
   }
-  
+
   /**
    * Update camera aspect ratio (on window resize)
    */
@@ -36,7 +36,7 @@ export class IsoCamera {
     this.camera.aspect = aspect;
     this.camera.updateProjectionMatrix();
   }
-  
+
   /**
    * Set the target position (what the camera looks at)
    */
@@ -44,7 +44,7 @@ export class IsoCamera {
     this.target.set(x, y, z);
     this.updatePosition();
   }
-  
+
   /**
    * Rotate the camera around the target
    */
@@ -52,7 +52,7 @@ export class IsoCamera {
     this.rotationAngle += deltaAngle;
     this.updatePosition();
   }
-  
+
   /**
    * Change the camera elevation angle
    */
@@ -63,7 +63,7 @@ export class IsoCamera {
     );
     this.updatePosition();
   }
-  
+
   /**
    * Zoom the camera in/out
    */
@@ -74,7 +74,18 @@ export class IsoCamera {
     );
     this.updatePosition();
   }
-  
+
+  /**
+   * Set the camera distance directly
+   */
+  setDistance(distance: number) {
+    this.distance = Math.max(
+      this.minDistance,
+      Math.min(this.maxDistance, distance)
+    );
+    this.updatePosition();
+  }
+
   /**
    * Snap to one of the four cardinal isometric views
    */
@@ -82,7 +93,7 @@ export class IsoCamera {
     this.rotationAngle = (Math.PI / 2) * index;
     this.updatePosition();
   }
-  
+
   /**
    * Update the camera position based on spherical coordinates
    */
@@ -91,7 +102,7 @@ export class IsoCamera {
     const x = this.target.x + this.distance * Math.cos(this.elevationAngle) * Math.cos(this.rotationAngle);
     const z = this.target.z + this.distance * Math.cos(this.elevationAngle) * Math.sin(this.rotationAngle);
     const y = this.target.y + this.distance * Math.sin(this.elevationAngle);
-    
+
     // Update camera position and orientation
     this.camera.position.set(x, y, z);
     this.camera.lookAt(this.target);

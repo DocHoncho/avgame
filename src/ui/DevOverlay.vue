@@ -6,7 +6,9 @@
       <div class="stat">Draws: {{ stats.drawCalls }}</div>
     </div>
     <div class="controls">
-      <div class="control">R - Toggle Rotation</div>
+      <div class="control">WASD - Move Player</div>
+      <div class="control">Mouse - Aim</div>
+      <div class="control">R - Toggle Camera Rotation</div>
       <div class="control">P - Pause Game</div>
     </div>
   </div>
