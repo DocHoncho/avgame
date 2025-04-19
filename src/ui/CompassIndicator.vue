@@ -12,6 +12,7 @@
     <div class="compass-info">
       <div>Angle: {{ angle.toFixed(0) }}°</div>
       <div>Facing: {{ direction }}</div>
+      <div>Rad: {{ (angle * Math.PI / 180).toFixed(2) }}</div>
     </div>
   </div>
 </template>
@@ -34,7 +35,7 @@ const rotation = computed(() => -angle.value); // Negative because we want to ro
 // Computed direction
 const direction = computed(() => {
   const normalizedAngle = ((angle.value % 360) + 360) % 360;
-  
+
   if (normalizedAngle >= 337.5 || normalizedAngle < 22.5) {
     return 'North';
   } else if (normalizedAngle >= 22.5 && normalizedAngle < 67.5) {

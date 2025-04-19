@@ -76,22 +76,27 @@ export class Player {
     // - S (inputY = -1) should move backward relative to camera
     // - D (inputX = 1) should move right relative to camera
 
-    // Adjust the input axes to align with camera direction
-    // In our camera setup with north = PI (180 degrees), we need to adjust the angle
-    // to make W move in the direction the camera is facing
-    const adjustedAngle = cameraAngle;
+    // In Three.js, the camera rotation works as follows:
+    // - 0 radians: Camera looks east (+X axis)
+    // - PI/2 radians: Camera looks north (-Z axis)
+    // - PI radians: Camera looks west (-X axis)
+    // - 3PI/2 radians: Camera looks south (+Z axis)
 
-    // Apply rotation matrix to input axes
-    const cos = Math.cos(adjustedAngle);
-    const sin = Math.sin(adjustedAngle);
+    // We need to map our WASD inputs to the world coordinates based on camera angle
+    // First, we'll determine the forward and right vectors based on camera angle
+    const forwardX = -Math.sin(cameraAngle); // X component of forward vector
+    const forwardZ = -Math.cos(cameraAngle); // Z component of forward vector
 
-    // Rotate the input vector by the adjusted angle
-    // Note: We're inverting the Y input because in our control scheme,
-    // pressing W (positive Y) should move forward (negative Z in Three.js)
-    const transformedX = inputX * cos + inputY * sin;
-    const transformedZ = inputX * sin - inputY * cos;
+    const rightX = Math.cos(cameraAngle);    // X component of right vector
+    const rightZ = -Math.sin(cameraAngle);   // Z component of right vector
 
-    return { x: transformedX, z: transformedZ };
+    // Now combine the forward and right vectors based on input
+    // Forward/backward movement (W/S) uses the forward vector
+    // Left/right movement (A/D) uses the right vector
+    const worldX = (inputY * forwardX) + (inputX * rightX);
+    const worldZ = (inputY * forwardZ) + (inputX * rightZ);
+
+    return { x: worldX, z: worldZ };
   }
 
   /**
