@@ -1,6 +1,8 @@
 # AVGame – Implementation Progress
 
 > **Purpose:** Track the progress of implementation against the phases defined in the Implementation Plan. This document serves as a living record of completed work, current focus, and upcoming tasks.
+>
+> **IMPORTANT:** This document should be updated regularly as tasks are started, completed, or modified. Refer to [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on keeping this document up-to-date.
 
 ---
 

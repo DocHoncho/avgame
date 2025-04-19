@@ -62,6 +62,10 @@ See [Implementation Plan](docs/ImplementationPlan.md) for the detailed roadmap.
 
 Check [Implementation Progress](docs/ImplementationProgress.md) for current status and completed work.
 
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our development workflow, commit guidelines, and how to properly track progress.
+
 ## License
 
 This project is private and proprietary.
