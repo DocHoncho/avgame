@@ -1,0 +1,46 @@
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.code-workspace
+
+# Build output
+/build/
+/dist/
+/out/
+
+# Dependencies
+/node_modules/
+/vendor/
+
+# Compiled files
+*.o
+*.pyc
+*.class
+*.dll
+*.exe
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache directories
+.cache/
+.temp/
+.tmp/
+
+# Coverage reports
+/coverage/
+
+# System Files
+Thumbs.db
