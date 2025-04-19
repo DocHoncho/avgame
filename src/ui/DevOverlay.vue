@@ -1,10 +1,24 @@
 <template>
-  <div class="dev-overlay">
+  <!-- Upper left: Stats and player position -->
+  <div class="dev-overlay top-left">
     <div class="stats">
       <div class="stat">FPS: {{ stats.fps }}</div>
       <div class="stat">Frame: {{ stats.frameTime }} ms</div>
       <div class="stat">Draws: {{ stats.drawCalls }}</div>
+      <div class="stat-divider"></div>
+      <div class="stat">Player X: {{ playerPos.x.toFixed(2) }}</div>
+      <div class="stat">Player Y: {{ playerPos.y.toFixed(2) }}</div>
+      <div class="stat">Player Z: {{ playerPos.z.toFixed(2) }}</div>
     </div>
+  </div>
+
+  <!-- Upper right: Compass -->
+  <div class="dev-overlay top-right">
+    <CompassIndicator />
+  </div>
+
+  <!-- Lower left: Controls -->
+  <div class="dev-overlay bottom-left">
     <div class="controls">
       <div class="control">WASD - Move Player</div>
       <div class="control">Mouse - Aim</div>
@@ -12,7 +26,6 @@
       <div class="control">R - Toggle Auto-Rotation</div>
       <div class="control">P - Pause Game</div>
     </div>
-    <CompassIndicator />
   </div>
 </template>
 
@@ -27,26 +40,38 @@ const stats = ref({
   drawCalls: 0
 });
 
+// Player position data
+const playerPos = ref({
+  x: 0,
+  y: 0,
+  z: 0
+});
+
 // Update stats from event
 const updateStats = (e: CustomEvent) => {
   stats.value = e.detail;
 };
 
+// Update player position from event
+const updatePlayerPos = (e: CustomEvent) => {
+  playerPos.value = e.detail;
+};
+
 // Lifecycle hooks
 onMounted(() => {
   window.addEventListener('dev-stats-update', updateStats as EventListener);
+  window.addEventListener('player-position-update', updatePlayerPos as EventListener);
 });
 
 onUnmounted(() => {
   window.removeEventListener('dev-stats-update', updateStats as EventListener);
+  window.removeEventListener('player-position-update', updatePlayerPos as EventListener);
 });
 </script>
 
 <style scoped>
 .dev-overlay {
   position: absolute;
-  top: 10px;
-  left: 10px;
   background-color: rgba(0, 0, 0, 0.7);
   color: #0af;
   font-family: 'Courier New', monospace;
@@ -58,16 +83,37 @@ onUnmounted(() => {
   user-select: none;
 }
 
+.top-left {
+  top: 10px;
+  left: 10px;
+}
+
+.top-right {
+  top: 10px;
+  right: 10px;
+}
+
+.bottom-left {
+  bottom: 10px;
+  left: 10px;
+}
+
 .stats {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .stat {
   margin-bottom: 5px;
 }
 
+.stat-divider {
+  height: 1px;
+  background-color: #0af;
+  opacity: 0.5;
+  margin: 8px 0;
+}
+
 .controls {
-  border-top: 1px solid #0af;
   padding-top: 5px;
 }
 

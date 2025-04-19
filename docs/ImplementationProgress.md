@@ -78,6 +78,7 @@
 - **2025-04-19:** Fixed camera-relative movement to properly align with camera direction
 - **2025-04-19:** Added axis helper and improved compass indicator for better debugging
 - **2025-04-19:** Fixed coordinate system to use North (-X), East (+Z), South (+X), West (-Z)
+- **2025-04-19:** Improved DevOverlay layout with player coordinates and repositioned elements
 
 ---
 

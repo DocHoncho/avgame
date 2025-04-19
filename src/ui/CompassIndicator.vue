@@ -10,10 +10,8 @@
       </div>
     </div>
     <div class="compass-info">
-      <div>Angle: {{ angle.toFixed(0) }}°</div>
-      <div>Facing: {{ direction }}</div>
-      <div>Rad: {{ (angle * Math.PI / 180).toFixed(2) }}</div>
-      <div>Cardinal: {{ getCardinalDirection() }}</div>
+      <div>{{ getCardinalDirection() }} ({{ angle.toFixed(0) }}°)</div>
+      <div>{{ direction }}</div>
     </div>
   </div>
 </template>

@@ -180,6 +180,18 @@ function updateDevOverlay(stats: any) {
       angle: angleDegrees
     }
   }));
+
+  // Update player position for dev overlay
+  const player = getPlayer();
+  const position = player.getPosition();
+
+  window.dispatchEvent(new CustomEvent('player-position-update', {
+    detail: {
+      x: position.x,
+      y: position.y,
+      z: position.z
+    }
+  }));
 }
 
 /**
