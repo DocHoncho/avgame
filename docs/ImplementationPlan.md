@@ -1,150 +1,142 @@
-# AVGame - Implementation Plan
+# AVGame – Implementation Plan (Rev‑A 2025‑04‑19)
 
-This document outlines the phased approach for implementing the game engine and core systems, with a focus on getting a basic test environment running first.
+> **Purpose** Road‑map the order of work so the Agent (and humans) know *exactly* what comes next and why. Phases are incremental vertical slices; each ends with something playable/testable.
 
-## Phase 1: Core Engine Foundation
-Goal: Basic rendering and game loop setup to enable visual testing.
+---
 
-### Steps
-1. Project Setup
-   - Initialize Vite + TypeScript + Vue project
-   - Set up basic project structure
-   - Configure build system
-   - Establish coding standards and linting
+## Phase 0 – Bootstrap
+| Deliverable | Notes |
+|-------------|-------|
+| **Repo scaffold** | Vite + TypeScript + Vue + Vitest config + ESLint/Prettier |
+| **Dev Quality Gates** | CI lint / test / type‑check, Husky pre‑commit hooks |
+| **AssetManager stub** | `load(url)` + progress bar with hard‑coded asset list |
 
-2. Basic Renderer
-   - Three.js integration
-   - Basic 3/4 isometric camera setup
-   - Test grid rendering
-   - Window resize handling
-   - Basic performance monitoring
+---
 
-3. Game Loop
-   - Main loop structure
-   - Time delta handling
-   - Basic state machine
-   - Debug overlay (FPS, etc.)
+## Phase 1 – Renderer Slice
+> *Goal:* render a rotating isometric test map at 60 FPS.
 
-## Phase 2: Input and Movement
-Goal: Basic player control system to test movement and camera behavior.
+1. **Renderer Core** (see `Renderer.md`)
+   - Three.js scene + `IsoCamera` helper.
+   - Instanced tile grid (16 × 16 test chunk).
+   - Edge‑glow & emissive bloom shaders.
+2. **Game Loop**
+   - Fixed‑tick `update(dt)` + interpolated render.
+   - Dev overlay FPS & frame‑ms.
+3. **StateMachine Skeleton** (see `StateManagement.md`)
+   - `AppRoot` → `MainMenu` → `Session.Loading` → `Playing`.
 
-### Steps
-1. Input System
-   - WASD movement handling
-   - Mouse position tracking
-   - Input state management
-   - Key binding system foundation
+**Exit criteria**: Map spins; resize works; `P` pauses via FSM.
 
-2. Agent Implementation
-   - Basic agent mesh/model
-   - Movement mechanics
-   - Collision detection foundation
-   - Camera following behavior
+---
 
-3. Test Environment
-   - Simple test level
-   - Movement boundary system
-   - Debug visualization tools
+## Phase 2 – Input & Agent Prototype
+> *Goal:* move a capsule around the grid without snapping.
 
-## Phase 3: Grid System and Rendering Optimization
-Goal: Efficient tile-based world representation with proper culling and instancing.
+1. **Input System**
+   - WASD / game‑pad axes.
+   - Mouse world‑ray utility for aim.
+2. **Physics & Continuous Collision** (see `GridSystem.md` §4)
+   - Capsule vs. merged AABB colliders.
+3. **ECS Integration**
+   - bitecs world with `Transform`, `Velocity`, `Collider`, `Renderable`.
+4. **Camera Follow & Snap Rotation**.
 
-### Steps
-1. Grid System
-   - Tile data structure
-   - Grid coordinate system
-   - Basic pathfinding (A*)
-   - Tile property system
+**Exit criteria**: Player moves & slides along walls in the test chunk.
 
-2. Rendering Optimization
-   - Geometry instancing
-   - Frustum culling
-   - Merged geometry for static elements
-   - Level of detail system
+---
 
-3. Visual Style Foundation
-   - Edge highlighting shader
-   - Basic glow effects
-   - Material system for Tron-like aesthetics
+## Phase 3 – Grid System & Level Assembly
+> *Goal:* walk seamlessly through a stitched level of 4 rooms.
 
-## Phase 4: UI Framework
-Goal: Establish the foundation for game UI and HUD elements.
+1. **GridSystem Implementation**
+   - Tile flags, LOS ray, A* path‑find.
+   - Room‑prefab loader; doorway stitching.
+2. **Chunk Streaming**
+   - Load next 32×32 tile chunk on proximity; unload last.
+3. **Collider Builder** (rect merge).
 
-### Steps
-1. Vue Integration
-   - Component architecture
-   - State management setup (Pinia)
-   - UI layer management
+**Exit criteria**: Random seed generates rooms; player cannot exit level bounds; FPS stable.
 
-2. Basic HUD
-   - Health/Integrity display
-   - Energy meter
-   - Status effects area
-   - Debug overlay improvements
+---
 
-3. Menu System
-   - Pause menu
-   - Basic inventory screen
-   - Settings interface
+## Phase 4 – ECS Feature Pack & State Sync
+> *Goal:* solid data pipeline for future mechanics.
 
-## Phase 5: Game Systems Integration
-Goal: Begin implementing core game mechanics and systems.
+1. **Component Pools Finalised** (see `ECS.md`).
+2. **System Pipeline Ordering** documented & enforced tests.
+3. **Event Bus** with ring buffer + inspector overlay.
+4. **Save/Load middleware** hooked into FSM.
 
-### Steps
-1. Combat Foundation
-   - Basic projectile system
-   - Hit detection
-   - Damage calculation
-   - Visual feedback
+**Exit criteria**: Spawn/despawn ±500 dummy entities ≤ 2 ms CPU/frame.
 
-2. Entity Component System
-   - Core ECS architecture
-   - Basic component types
-   - Entity management
-   - Component relationships
+---
 
-3. Effects System
-   - Particle system
-   - Visual effects manager
-   - Basic shader effects
-   - Audio system foundation
+## Phase 5 – Combat Vertical Slice
+> *Goal:* shoot things, deal damage, see numbers fly.
 
-## Phase 6: Development Tools
-Goal: Create tools necessary for content creation and debugging.
+1. **Projectile System** — pooled bolts/hitscan, spawn via click.
+2. **CombatSystem**   (see `CombatSystem.md`)
+   - Fixed‑point math engine.
+   - Global `ModTable`; support +% dmg vs. corrupted.
+3. **Status Effects & Cooldowns** — burn DOT & overheating.
+4. **Hit FX & numbers** — small particle burst, floating text.
 
-### Steps
-1. Debug Tools
-   - Entity inspector
-   - Performance profiler
-   - State debugger
-   - Grid visualizer
+**Exit criteria**: Dummy enemies take damage, burn, and die; crit chance visible.
 
-2. Level Editor Foundation
-   - Basic tile placement
-   - Entity placement
-   - Property editor
-   - Save/Load functionality
+---
 
-## Testing Strategy
-Each phase should include:
-- Unit tests for core systems
-- Integration tests for system interactions
-- Performance benchmarks
-- Playtesting scenarios
+## Phase 6 – HUD & Menus
+> *Goal:* all moment‑to‑moment UI present.
 
-## Success Criteria
-Each phase should meet these criteria before moving to the next:
-- All core features functional
-- Performance meets target metrics
-- No blocking bugs
-- Documentation updated
-- Tests passing
+1. **Vue HUD** — health, energy, heat.
+2. **Pause / Settings menus** — under FSM `Session.Paused`.
+3. **Mod Inspector** — hover enemy shows active modifiers.
 
-## Initial Focus
-For immediate implementation, focus should be on Phase 1 and early Phase 2, specifically:
-1. Basic project structure with Three.js rendering
-2. Simple input handling
-3. Basic agent movement
-4. Test environment for iteration
+**Exit criteria**: Play 5 minutes without needing dev tools.
 
-This will provide the foundation needed to experiment with movement mechanics and visual style, which will inform later development decisions.
+---
+
+## Phase 7 – Effects & Polish Pass I
+- Particle system GPU instancing.
+- Post‑FX stack complete (bloom, CRT vignette).
+- Basic SFX & adaptive music stub.
+
+---
+
+## Phase 8 – Editor Toolkit Alpha
+- In‑engine tile/prop painting.
+- Test play‑mode toggle.
+- Export room prefab JSON.
+
+---
+
+## Phase 9 – Optimization & QA Pass
+- Renderer profiling; shader pre‑compile.
+- Memory leak hunt; GC metrics.
+- Combat math fuzz tests.
+- Automated regression scenes.
+
+---
+
+## Phase 10 – Stretch / Future Work
+- Multiplayer lock‑step prototype.
+- WebGPU backend toggle.
+- Steam Deck perf certification.
+
+---
+
+## Phase Exit Checklist
+1. **All acceptance tests green** (unit, integration, perf budget).
+2. **Doc updates** (relevant subsystem .md files note changes).
+3. **CI build succeeds** release artifact.
+4. **Playtest sign‑off** by at least one human & one AI agent.
+
+---
+
+## Current Focus
+1. **Phase 1: Renderer Slice** — iso camera, instanced tiles, FSM skeleton.
+2. **Phase 2: Input + Collision** groundwork — capsule movement vs. rect merge.
+
+Stay narrow, get visible results, iterate fast.
+

@@ -20,7 +20,7 @@
 
 ### Core Systems
 
-#### Renderer
+#### Renderer (docs/engine/Renderer.md)
 
 - Three.js‑based 3‑D renderer
 - Fixed 3 ⁄ 4 isometric camera with optional rotation
@@ -41,7 +41,7 @@
 - UI input routing (menus, inventory)
 - Game‑pad support (future)
 
-#### State Management
+#### State Management (docs/engine/StateManagement.md)
 
 ```
 MainMenu
@@ -69,12 +69,16 @@ MainMenu
 
 ### Game Systems
 
-#### Grid System
+#### Grid System & Level Composition (docs/engine/GridSystem.md)
 
-- Tile‑based world graph
-- A\* path‑finding
-- Line‑of‑sight & fog
-- Tile flags (walkable, corrupted, etc.)
+- **Logical tiles, continuous movement** – World logic runs on a square‑tile lattice, but player / AI positions are float‑based; path‑finding snaps to tile centers only when needed.
+- **Merged collision meshes** – During level build we union adjacent solid tiles into larger AABB/OBB blocks, reducing collider count by 80‑90 %.
+- **Room prefabs + procedural assembly** – Levels are stitched from JSON “room” templates (hand‑authored or RNG‑picked). Each prefab has:
+  - `entrances[]` (cardinal openings),
+  - `bounds` (tile rect),
+  - `tags` (biome, difficulty, theme).
+- **Chunk streaming** – The Grid System exposes `loadChunk(x,z)` / `unloadChunk(x,z)` so distant rooms relinquish GPU/physics resources.
+- **Extensible tile props** – `walkable`, `corrupted`, `slow`, `hazard`, etc., stored as bitmasks for fast checks.
 
 #### Entity‑Component System (ECS)
 
