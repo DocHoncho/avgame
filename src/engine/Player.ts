@@ -16,7 +16,7 @@ export class Player {
   private position: THREE.Vector3;
   private velocity: THREE.Vector3;
   private acceleration: THREE.Vector3;
-  private speed: number = 12.0; // Increased for faster movement
+  private speed: number = 24.0; // Increased for faster movement
   private maxSpeed: number = 15.0; // Increased max speed
   private friction: number = 0.8; // Slightly reduced for more responsive movement
 
