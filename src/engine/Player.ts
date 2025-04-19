@@ -77,17 +77,19 @@ export class Player {
     // - D (inputX = 1) should move right relative to camera
 
     // Adjust the input axes to align with camera direction
-    // We need to rotate the input vector by the camera angle + 90 degrees (PI/2)
-    // because in our camera setup, 0 degrees is east, but we want 0 to be the camera's forward direction
-    const adjustedAngle = cameraAngle - Math.PI / 2;
+    // In our camera setup with north = PI (180 degrees), we need to adjust the angle
+    // to make W move in the direction the camera is facing
+    const adjustedAngle = cameraAngle;
 
     // Apply rotation matrix to input axes
     const cos = Math.cos(adjustedAngle);
     const sin = Math.sin(adjustedAngle);
 
     // Rotate the input vector by the adjusted angle
-    const transformedX = inputX * cos - inputY * sin;
-    const transformedZ = inputX * sin + inputY * cos;
+    // Note: We're inverting the Y input because in our control scheme,
+    // pressing W (positive Y) should move forward (negative Z in Three.js)
+    const transformedX = inputX * cos + inputY * sin;
+    const transformedZ = inputX * sin - inputY * cos;
 
     return { x: transformedX, z: transformedZ };
   }

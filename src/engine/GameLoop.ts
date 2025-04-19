@@ -132,18 +132,30 @@ function render(interpolation: number) {
 }
 
 /**
- * Update the developer overlay with performance stats
+ * Update the developer overlay with performance stats and camera info
  */
 function updateDevOverlay(stats: any) {
   // Calculate FPS (simple moving average)
   const fps = stats.frameTime > 0 ? Math.round(1000 / stats.frameTime) : 0;
 
-  // Update custom event for the Vue component to consume
+  // Update stats event for the Vue component to consume
   window.dispatchEvent(new CustomEvent('dev-stats-update', {
     detail: {
       fps,
       frameTime: stats.frameTime.toFixed(2),
       drawCalls: stats.drawCalls
+    }
+  }));
+
+  // Update camera angle for compass indicator
+  const renderer = getRenderer();
+  const cameraAngle = renderer.camera.getRotationAngle();
+  // Convert radians to degrees and normalize to 0-360 range
+  const angleDegrees = ((cameraAngle * 180 / Math.PI) % 360 + 360) % 360;
+
+  window.dispatchEvent(new CustomEvent('camera-angle-update', {
+    detail: {
+      angle: angleDegrees
     }
   }));
 }

@@ -12,11 +12,13 @@
       <div class="control">R - Toggle Auto-Rotation</div>
       <div class="control">P - Pause Game</div>
     </div>
+    <CompassIndicator />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
+import CompassIndicator from './CompassIndicator.vue';
 
 // Stats data
 const stats = ref({
