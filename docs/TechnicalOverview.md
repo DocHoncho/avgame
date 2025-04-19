@@ -1,167 +1,244 @@
-# AVGame - Technical Overview
+# AVGame – Technical Overview
 
 ## Core Tech Stack
-- **TypeScript** - Primary language
-- **Vite** - Build system and dev server with hot reloading
-- **Three.js** - 3D graphics engine
-- **Vue** - UI/HUD system (native Vite integration)
+
+- **TypeScript** – primary language
+- **Vite** – build system & dev server with hot‑reload
+- **Three.js** – 3‑D graphics engine
+- **Vue 3** – UI/HUD framework (native Vite integration)
+
+## Basic Directory Structure
+
+```
+./              # project root
+├─ src/         # source code
+├─ public/      # static assets referenced by Vite
+└─ docs/        # technical & design docs
+```
 
 ## Engine Architecture
 
 ### Core Systems
 
 #### Renderer
-- Three.js based 3D renderer
-- Fixed 3/4 isometric view with optional rotation
-- Tron-inspired visual style:
-  - Edge highlighting/glow effects
-  - Emission maps for energy/corruption visualization
-  - Shader system for special effects (corruption spread, energy pulses)
-- Efficient tile-based rendering:
-  - Geometry instancing for repeated elements
-  - Frustum culling
-  - Merged geometry for static elements
-  - Level-of-detail system for distant tiles
+
+- Three.js‑based 3‑D renderer
+- Fixed 3 ⁄ 4 isometric camera with optional rotation
+- Tron‑inspired visual style:
+  - Edge glow & emissive outlines
+  - Emission maps for energy/corruption layers
+  - Custom shaders (corruption spread, energy pulses)
+- Efficient tile rendering:
+  - Geometry instancing for repeats
+  - View‑frustum & occlusion culling
+  - Merged geometry for static decor
+  - Level‑of‑detail (LOD) on distant tiles
 
 #### Input System
-- WASD movement
-- Mouse aim/targeting
-- Key binding system for abilities
-- UI input handling (menus, inventory)
-- Controller support consideration
+
+- **WASD** movement + mouse aim
+- Re‑bindable hot‑keys for abilities
+- UI input routing (menus, inventory)
+- Game‑pad support (future)
 
 #### State Management
-- Game State Machine:
-  ```
-  MainMenu
-    └─ GameSession
-         ├─ Playing
-         ├─ Paused
-         ├─ Inventory
-         └─ Map
-    └─ LevelEditor
-    └─ Settings
-  ```
-- State persistence system
-- Save/Load functionality
+
+```
+MainMenu
+  └─ GameSession
+       ├─ Playing
+       ├─ Paused
+       ├─ Inventory
+       └─ Map
+  └─ LevelEditor
+  └─ Settings
+```
+
+- State persistence & save/load
 
 #### UI Framework
-- Vue-based UI system
-- Composable components for:
-  - HUD elements (health, energy, status effects)
-  - Inventory screens
-  - Skill trees
-  - Equipment modification
-  - Status/buff displays
-  - Tooltips
-- UI state management (Pinia)
+
+- Vue Single‑File Components (SFC)
+- Pinia store for UI state
+- Composable widgets:
+  - HUD (health, energy, status)
+  - Inventory / equipment
+  - Skill‑tree
+  - Buff/debuff tracker
+  - Tooltips & context panels
 
 ### Game Systems
 
 #### Grid System
-- Tile-based world representation
-- Pathfinding (A*)
-- Line of sight calculations
-- Collision detection
-- Tile property system (walkable, corrupted, etc.)
 
-#### Entity Component System (ECS)
-Components needed for:
-- Physical properties (position, rotation)
-- Combat stats (integrity, firewall, energy)
-- Status effects
-- AI behaviors
-- Projectile properties
-- Collision
-- Visual effects
+- Tile‑based world graph
+- A\* path‑finding
+- Line‑of‑sight & fog
+- Tile flags (walkable, corrupted, etc.)
+
+#### Entity‑Component System (ECS)
+
+Components:
+
+- Transform (pos/rot/scale)
+- Combat stats (Integrity, Firewall, Energy)
+- AI behaviour tree
+- Projectiles & hit‑boxes
+- Status effects & timers
+- Visual & audio emitters
 
 #### Combat System
-- Projectile management
-- Hitbox detection
-- Damage calculation
-- Status effect application
-- Heat/energy management
-- Ability cooldowns
+
+- Projectile pooling & travel
+- Hit detection
+- Damage & resist calculations
+- Status effect handler
+- Heat/energy & cooldown tracking
 
 #### Particle System
-- Projectile trails
-- Impact effects
-- Status indicators
-- Environmental effects (corruption spread)
-- Energy/power visualizations
+
+- Trails, impacts, environmental FX
+- Corruption spread overlays
+- Energy pulse & UI particles
 
 #### Audio System
-- Sound effect management
-- Music system
-- Dynamic mixing based on game state
-- Positional audio for effects
+
+- SFX registry & pooling
+- Adaptive music layers
+- Positional & doppler audio
 
 ### Data Management
 
-#### Asset Loading
-- Model loading
-- Texture management
-- Sound loading
-- Level data
-- Progressive loading for large maps
+#### Asset Loading (build‑time)
+
+- Vite handles hashing, compression, code‑splitting
+- Plugins: KTX2/Basis texture transcoding, vite‑imagetools, vite‑plugin‑glsl
+- Build emits `asset‑manifest.json` mapping logical paths → hashed URLs
+
+#### **Asset Manager** (runtime)
+
+> Centralised service for *when* and *how* assets enter/leave memory.
+
+**Responsibilities**
+
+- Async fetch & decode of models, textures, audio ⟶ `Promise<Asset>`
+- In‑memory cache with reference counts
+- Progress events for loading screens
+- Variant selection (hi/lo‑res) & platform fall‑back
+- Graceful disposal (`texture.dispose()`, geometry cleanup)
+
+**Implementation sketch**
+
+```ts
+class AssetManager {
+  private cache = new Map<string, {promise: Promise<any>; ref: number}>();
+
+  load<T>(key: string, url: string, loader: Loader<T>): Promise<T> {
+    const cached = this.cache.get(key);
+    if (cached) { cached.ref++; return cached.promise; }
+
+    const promise = new Promise<T>((res, rej)=>
+      loader.load(url, res, undefined, rej));
+
+    this.cache.set(key, { promise, ref: 1 });
+    return promise;
+  }
+
+  release(key: string) {
+    const rec = this.cache.get(key);
+    if (!rec) return;
+    if (--rec.ref === 0) {
+      // TODO: explicit GL resource disposal here
+      this.cache.delete(key);
+    }
+  }
+}
+export const assetManager = new AssetManager();
+```
+
+**Boot sequence**
+
+1. Fetch `asset‑manifest.json`.
+2. Push required assets for first scene into `assetManager.load()`.
+3. Display loading bar via progress events.
+4. Transition GameState → *Playing* once all Promises resolve.
+
+**Level streaming**
+
+```mermaid
+graph LR
+ A[Current Zone] -- elevator --> B(Loading Screen)
+ B -->|preload next| assetManager
+ B --> C[Next Zone]
+ A -- release --> assetManager
+```
+
+**Future extensions**
+
+- Priority queues for streaming & LOD
+- CDN base switching via `assetManager.setBase(url)`
+- Hot‑reload path in Level Editor using `import.meta.glob`
 
 #### Save System
-- Character progression
-- Equipment loadouts
-- Level state
-- Settings
+
+- Character progression & load‑outs
+- Level state snapshot
+- Settings (video, key‑binds)
 
 ### Development Tools
 
-#### Debug Tools
-- FPS counter
-- Performance metrics
-- Hit box visualization
-- Path visualization
-- State inspector
+#### Debug Overlay
+
+- FPS gauge
+- ECS/world inspectors
+- Hit‑box & path visualisers
+- Memory & VRAM statistics
 
 #### Level Editor
-- Tile placement
-- Entity placement
-- Property editing
-- Test mode
-- Import/Export functionality
 
-## Performance Considerations
+- Tile & entity palette
+- Property panel
+- In‑editor play‑test mode
+- Import/Export `.json` level spec
 
-### Rendering Optimization
-- Instanced rendering for repeated elements
+## Performance
+
+### Rendering
+
+- Instanced & batch rendering
 - Occlusion culling
-- Texture atlasing
-- Shader optimization
-- Batch rendering for particles
+- Texture atlases
+- Shader pre‑compilation & caching
 
-### Memory Management
-- Asset pooling
-- Entity pooling
-- Garbage collection optimization
-- Memory usage monitoring
+### Memory
 
-### Network Considerations
-- Potential future multiplayer support
-- Client/Server architecture planning
-- State synchronization design
+- Asset & entity pooling
+- GC‑friendly object reuse
+- Heap/V8 & WebGL memory tracking
 
-## Build and Deploy
-- Vite configuration
-- Asset bundling
-- Production optimization
-- Cross-platform considerations
+### Networking (future‑proof)
 
-## Testing Framework
-- Unit testing setup
-- Integration testing
-- Performance testing
-- Automated UI testing
+- Client/server tick design draft
+- Deterministic lock‑step vs. state sync evaluation
+
+## Build & Deploy
+
+- Vite prod config (`mode=production`, `base=/dist/`)
+- Brotli/gzip compression
+- Electron & Web export targets
+
+## Testing
+
+- Vitest unit tests
+- Playwright end‑to‑end UI tests
+- Automated performance regression suite
 
 ## Next Steps
-1. Set up basic project structure
-2. Implement core rendering pipeline
-3. Create basic movement and control system
-4. Establish UI framework
-5. Develop initial game state management
+
+1. Scaffold repo & Vite config ✅
+2. Implement core rendering pipeline ➜ *WIP*
+3. Stub AssetManager & bootstrap loader screen
+4. Basic movement & input mapping
+5. Establish UI widgets & HUD
+6. Prototype ECS & combat loop
+
