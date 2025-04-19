@@ -29,11 +29,13 @@
 ### Phase 2 – Input & Agent Prototype 🔄
 | Task | Status | Notes |
 |------|--------|-------|
-| **Input System** | 🔄 In Progress | WASD / game-pad axes |
-| **Mouse world-ray utility** | ⏳ Planned | For aiming |
-| **Physics & Continuous Collision** | ⏳ Planned | Capsule vs. merged AABB colliders |
-| **ECS Integration** | ⏳ Planned | bitecs world with Transform, Velocity, Collider, Renderable |
-| **Camera Follow & Snap Rotation** | ⏳ Planned | |
+| **Input System** | ✅ Complete | WASD / arrow keys movement, key mapping system |
+| **Mouse world-ray utility** | ✅ Complete | Implemented WorldRay class with plane intersection |
+| **Player Movement** | ✅ Complete | Basic player capsule with physics-based movement |
+| **Aim Indicator** | ✅ Complete | Visual indicator showing aim direction |
+| **Camera Follow** | ✅ Complete | Camera follows player position |
+| **Physics & Continuous Collision** | 🔄 In Progress | Basic physics implemented, collision detection in progress |
+| **ECS Integration** | ⏳ Planned | Will implement after collision system |
 
 ---
 
