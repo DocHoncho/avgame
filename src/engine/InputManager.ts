@@ -144,19 +144,18 @@ export class InputManager {
   private handleKeyDown(event: KeyboardEvent): void {
     const key = event.key.toLowerCase();
 
-    // Update key state
-    if (!this.keyState[key]) {
-      this.keyState[key] = true;
+    // Always update key state, even if it's already down
+    // This helps with key repeat and makes movement more responsive
+    this.keyState[key] = true;
 
-      // Map to action if defined
-      const action = this.keyMap[key];
-      if (action) {
-        this.setActionState(action, true);
-      }
-
-      // Update movement axes
-      this.updateAxes();
+    // Map to action if defined
+    const action = this.keyMap[key];
+    if (action) {
+      this.setActionState(action, true);
     }
+
+    // Update movement axes
+    this.updateAxes();
   }
 
   /**
@@ -261,6 +260,11 @@ export class InputManager {
       const length = Math.sqrt(this.axes.moveX * this.axes.moveX + this.axes.moveY * this.axes.moveY);
       this.axes.moveX /= length;
       this.axes.moveY /= length;
+    }
+
+    // Emit movement change event for immediate response
+    if (this.axes.moveX !== 0 || this.axes.moveY !== 0) {
+      eventBus.emit('input:movement', { x: this.axes.moveX, y: this.axes.moveY });
     }
   }
 

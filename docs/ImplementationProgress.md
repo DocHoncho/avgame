@@ -33,7 +33,7 @@
 | **Mouse world-ray utility** | ✅ Complete | Implemented WorldRay class with plane intersection |
 | **Player Movement** | ✅ Complete | Basic player capsule with physics-based movement |
 | **Aim Indicator** | ✅ Complete | Visual indicator showing aim direction |
-| **Camera Follow** | ✅ Complete | Camera follows player position |
+| **Camera Follow & Snap Rotation** | ✅ Complete | Camera follows player + Q/E for 90° rotation |
 | **Physics & Continuous Collision** | 🔄 In Progress | Basic physics implemented, collision detection in progress |
 | **World Layout** | ✅ Complete | Simple square room with wall perimeter instead of checkerboard pattern |
 | **ECS Integration** | ⏳ Planned | Will implement after collision system |
@@ -71,6 +71,7 @@
 - **2025-04-19:** Initial project setup completed with Phase 0 and Phase 1 implementation
 - **2025-04-19:** Decided to use XState for state management due to its robust features and dev tools
 - **2025-04-19:** Updated world layout to use a simple square room with walls instead of offset checkerboard pattern
+- **2025-04-19:** Improved movement system with camera-relative controls and faster movement speed
 
 ---
 

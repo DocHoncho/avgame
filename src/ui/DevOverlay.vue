@@ -8,7 +8,8 @@
     <div class="controls">
       <div class="control">WASD - Move Player</div>
       <div class="control">Mouse - Aim</div>
-      <div class="control">R - Toggle Camera Rotation</div>
+      <div class="control">Q/E - Rotate Camera 90°</div>
+      <div class="control">R - Toggle Auto-Rotation</div>
       <div class="control">P - Pause Game</div>
     </div>
   </div>

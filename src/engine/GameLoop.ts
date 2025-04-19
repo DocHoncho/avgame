@@ -41,14 +41,22 @@ export function initGameEngine() {
     appStore.send(SessionEventType.ASSETS_LOADED);
   });
 
-  // Debug controls
-  if (import.meta.env.DEV) {
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'r') {
-        autoRotate = !autoRotate;
-      }
-    });
-  }
+  // Camera rotation controls
+  window.addEventListener('keydown', (e) => {
+    // Toggle auto-rotation with R key
+    if (e.key === 'r') {
+      autoRotate = !autoRotate;
+    }
+
+    // Snap camera rotation with Q and E keys
+    if (e.key === 'q') {
+      const renderer = getRenderer();
+      renderer.rotateCamera(-Math.PI / 2); // Rotate 90 degrees counter-clockwise
+    } else if (e.key === 'e') {
+      const renderer = getRenderer();
+      renderer.rotateCamera(Math.PI / 2); // Rotate 90 degrees clockwise
+    }
+  });
 }
 
 /**

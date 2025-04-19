@@ -87,6 +87,13 @@ export class IsoCamera {
   }
 
   /**
+   * Get the current rotation angle
+   */
+  getRotationAngle(): number {
+    return this.rotationAngle;
+  }
+
+  /**
    * Snap to one of the four cardinal isometric views
    */
   snapToCardinal(index: number) {

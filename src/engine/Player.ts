@@ -16,9 +16,9 @@ export class Player {
   private position: THREE.Vector3;
   private velocity: THREE.Vector3;
   private acceleration: THREE.Vector3;
-  private speed: number = 5.0;
-  private maxSpeed: number = 8.0;
-  private friction: number = 0.85;
+  private speed: number = 12.0; // Increased for faster movement
+  private maxSpeed: number = 15.0; // Increased max speed
+  private friction: number = 0.8; // Slightly reduced for more responsive movement
 
   // Collision properties
   private radius: number = 0.4;
@@ -61,19 +61,40 @@ export class Player {
   }
 
   /**
+   * Transform input axes based on camera rotation
+   * This makes WASD movement relative to the camera view
+   */
+  private transformInputAxes(inputX: number, inputY: number): { x: number, z: number } {
+    // Get the camera rotation angle
+    const renderer = getRenderer();
+    const cameraAngle = renderer.camera.getRotationAngle();
+
+    // Apply rotation matrix to input axes
+    const cos = Math.cos(cameraAngle);
+    const sin = Math.sin(cameraAngle);
+
+    // Rotate the input vector by the camera angle
+    const transformedX = inputX * cos - inputY * sin;
+    const transformedZ = inputX * sin + inputY * cos;
+
+    return { x: transformedX, z: transformedZ };
+  }
+
+  /**
    * Update player state
    */
   public update(deltaTime: number): void {
     // Get input axes
     const { x: moveX, y: moveY } = inputManager.getMovementAxes();
 
-    // Apply acceleration based on input
-    // Note: In isometric view, we need to transform the input directions
-    // to match the world space directions
+    // Transform input axes based on camera rotation
+    const { x: worldX, z: worldZ } = this.transformInputAxes(moveX, moveY);
+
+    // Apply acceleration based on transformed input
     this.acceleration.set(
-      moveX * this.speed,
+      worldX * this.speed,
       0,
-      -moveY * this.speed // Negative because forward is -z in Three.js
+      -worldZ * this.speed // Negative because forward is -z in Three.js
     );
 
     // Apply acceleration to velocity
