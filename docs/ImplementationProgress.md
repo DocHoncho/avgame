@@ -72,6 +72,7 @@
 - **2025-04-19:** Decided to use XState for state management due to its robust features and dev tools
 - **2025-04-19:** Updated world layout to use a simple square room with walls instead of offset checkerboard pattern
 - **2025-04-19:** Improved movement system with camera-relative controls and faster movement speed
+- **2025-04-19:** Changed default camera orientation to point north for better navigation
 
 ---
 

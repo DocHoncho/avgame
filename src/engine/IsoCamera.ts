@@ -15,7 +15,7 @@ export class IsoCamera {
 
   // Camera position in spherical coordinates
   private distance = 20;
-  private rotationAngle = Math.PI / 4; // 45 degrees
+  private rotationAngle = Math.PI; // Point north (-y in Three.js)
   private elevationAngle = Math.PI / 6; // 30 degrees
 
   // Camera limits
@@ -95,9 +95,11 @@ export class IsoCamera {
 
   /**
    * Snap to one of the four cardinal isometric views
+   * @param index 0=North, 1=East, 2=South, 3=West
    */
   snapToCardinal(index: number) {
-    this.rotationAngle = (Math.PI / 2) * index;
+    // North = PI, East = PI/2, South = 0, West = 3PI/2
+    this.rotationAngle = Math.PI - (Math.PI / 2) * index;
     this.updatePosition();
   }
 

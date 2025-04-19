@@ -51,10 +51,18 @@ export function initGameEngine() {
     // Snap camera rotation with Q and E keys
     if (e.key === 'q') {
       const renderer = getRenderer();
-      renderer.rotateCamera(-Math.PI / 2); // Rotate 90 degrees counter-clockwise
+      // Rotate to the next cardinal direction counter-clockwise
+      const currentAngle = renderer.camera.getRotationAngle();
+      const cardinalIndex = Math.round((Math.PI - currentAngle) / (Math.PI / 2)) % 4;
+      const nextCardinalIndex = (cardinalIndex + 1) % 4;
+      renderer.camera.snapToCardinal(nextCardinalIndex);
     } else if (e.key === 'e') {
       const renderer = getRenderer();
-      renderer.rotateCamera(Math.PI / 2); // Rotate 90 degrees clockwise
+      // Rotate to the next cardinal direction clockwise
+      const currentAngle = renderer.camera.getRotationAngle();
+      const cardinalIndex = Math.round((Math.PI - currentAngle) / (Math.PI / 2)) % 4;
+      const nextCardinalIndex = (cardinalIndex + 3) % 4; // +3 is equivalent to -1 in modulo 4
+      renderer.camera.snapToCardinal(nextCardinalIndex);
     }
   });
 }
