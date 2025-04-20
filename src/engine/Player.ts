@@ -83,10 +83,19 @@ export class Player {
     // Apply rotation matrix to input axes
     // For camera-relative movement, we need to rotate the input vector by the camera angle
     // [ cos(θ) -sin(θ) ] [ inputX ]
-    // [ sin(θ)  cos(θ) ] [ -inputY ]
-    // Note: We negate inputY because forward is positive in input space but negative in world Z
-    const worldX = inputX * cosAngle - (-inputY) * sinAngle;
-    const worldZ = inputX * sinAngle + (-inputY) * cosAngle;
+    // [ sin(θ)  cos(θ) ] [ inputY ]
+    // Note: We use positive inputY because in Three.js:
+    // - Forward is in the direction the camera is facing
+    // - Right is 90 degrees clockwise from forward
+    const worldX = inputX * cosAngle - inputY * sinAngle;
+    const worldZ = inputX * sinAngle + inputY * cosAngle;
+
+    // Debug log for movement directions
+    if (inputX !== 0 || inputY !== 0) {
+      console.log(`Input: (${inputX.toFixed(2)}, ${inputY.toFixed(2)}), ` +
+                  `Camera Angle: ${(cameraAngle * 180 / Math.PI).toFixed(0)}°, ` +
+                  `World Movement: (${worldX.toFixed(2)}, ${worldZ.toFixed(2)})`);
+    }
 
     return { x: worldX, z: worldZ };
   }

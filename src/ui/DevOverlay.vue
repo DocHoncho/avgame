@@ -12,9 +12,12 @@
     </div>
   </div>
 
-  <!-- Upper right: Compass -->
+  <!-- Upper right: Compass and Direction Visualizer -->
   <div class="dev-overlay top-right">
     <CompassIndicator />
+    <div class="visualizer-container">
+      <DirectionVisualizer />
+    </div>
   </div>
 
   <!-- Lower left: Controls -->
@@ -31,6 +34,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import CompassIndicator from './CompassIndicator.vue';
+import DirectionVisualizer from './DirectionVisualizer.vue';
 
 // Stats data
 const stats = ref({
@@ -119,5 +123,9 @@ onUnmounted(() => {
 .control {
   margin-top: 5px;
   opacity: 0.8;
+}
+
+.visualizer-container {
+  margin-top: 10px;
 }
 </style>

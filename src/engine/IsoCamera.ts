@@ -15,7 +15,7 @@ export class IsoCamera {
 
   // Camera position in spherical coordinates
   private distance = 20;
-  private rotationAngle = Math.PI / 2; // Fixed to looking north (-Z axis)
+  private rotationAngle = 0; // Initial angle - looking at +X (East)
   private elevationAngle = Math.PI / 6; // 30 degrees
 
   // Camera limits
@@ -104,6 +104,9 @@ export class IsoCamera {
     const angles = [Math.PI/2, 0, 3*Math.PI/2, Math.PI];
     this.rotationAngle = angles[index % 4];
     this.updatePosition();
+
+    // Debug log for camera direction
+    console.log(`Camera snapped to ${['North', 'East', 'South', 'West'][index % 4]} (${this.rotationAngle} radians)`);
   }
 
   /**

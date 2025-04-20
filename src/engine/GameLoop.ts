@@ -147,15 +147,22 @@ function updateDevOverlay(stats: any) {
     }
   }));
 
-  // Update camera angle for compass indicator
+  // Update camera angle for compass indicator and direction visualizer
   const renderer = getRenderer();
   const cameraAngle = renderer.camera.getRotationAngle();
   // Convert radians to degrees and normalize to 0-360 range
   const angleDegrees = ((cameraAngle * 180 / Math.PI) % 360 + 360) % 360;
 
+  // Calculate forward vector based on camera angle
+  const forwardX = Math.cos(cameraAngle);
+  const forwardZ = Math.sin(cameraAngle);
+
   window.dispatchEvent(new CustomEvent('camera-angle-update', {
     detail: {
-      angle: angleDegrees
+      angle: angleDegrees,
+      radians: cameraAngle,
+      forwardX: forwardX,
+      forwardZ: forwardZ
     }
   }));
 
