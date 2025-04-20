@@ -30,6 +30,7 @@
       <div class="control-divider"></div>
       <div class="control debug">Debug Controls:</div>
       <div class="control debug">C - Toggle Collider Visualization</div>
+      <div class="control debug">E - Toggle ECS Entity Visualization</div>
       <div class="control debug">F12 - Toggle Debug Overlay</div>
     </div>
   </div>

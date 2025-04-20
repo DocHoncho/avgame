@@ -5,7 +5,7 @@ import { inputManager, InputAction } from './InputManager';
 import { initPlayer, getPlayer } from './Player';
 import { initAimIndicator, getAimIndicator } from './AimIndicator';
 import { initCollisionSystem, getCollisionSystem } from './CollisionSystem';
-import { initECS, updateECS, createTestObstacles } from '../ecs/integration';
+import { initECS, updateECS, createTestObstacles, setEcsEntitiesVisible } from '../ecs/integration';
 
 // Game loop configuration
 const FIXED_TIMESTEP = 1 / 60; // 60 updates per second
@@ -26,6 +26,7 @@ let showColliders = false;
 
 // ECS integration
 let ecsInitialized = false;
+let showEcsEntities = false;
 
 /**
  * Initialize the game engine
@@ -97,6 +98,12 @@ export function initGameEngine() {
         collisionSystem.removeDebugVisualization(renderer.scene);
         console.log('Collider visualization disabled');
       }
+    }
+
+    // Toggle ECS entity visualization with E key
+    if (e.key === 'e' && ecsInitialized) {
+      showEcsEntities = !showEcsEntities;
+      setEcsEntitiesVisible(showEcsEntities);
     }
   });
 }

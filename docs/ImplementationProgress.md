@@ -90,6 +90,7 @@
 - **2025-04-20:** Improved collision system to handle corner cases and added debug visualization (toggle with C key)
 - **2025-04-20:** Enhanced test room with two chambers connected by a doorway and added standalone obstacle tiles
 - **2025-04-20:** Implemented basic ECS integration with bitecs library, including Transform, Velocity, Collider, and Renderable components
+- **2025-04-20:** Added toggle for ECS entity visualization (press E to toggle)
 
 ---
 

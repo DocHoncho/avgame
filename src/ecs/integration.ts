@@ -2,7 +2,7 @@ import { IWorld } from 'bitecs';
 import { getRenderer } from '../engine/Renderer';
 import { getPlayer } from '../engine/Player';
 import { initWorld, getWorld, createPipeline } from './world';
-import { movementSystem, collisionSystem, renderSystem } from './systems';
+import { movementSystem, collisionSystem, renderSystem, showEcsEntities } from './systems';
 import { createPlayerEntity, createObstacleEntity } from './index';
 import * as THREE from 'three';
 
@@ -14,8 +14,11 @@ let playerEntityId: number | null = null;
 
 /**
  * Initialize the ECS system and integrate it with the existing game
+ * @param visible Whether ECS entities should be visible (default: false)
  */
-export function initECS(): void {
+export function initECS(visible: boolean = false): void {
+  // Set the visibility flag
+  showEcsEntities = visible;
   try {
     // Initialize the ECS world
     const world = initWorld();
@@ -95,6 +98,15 @@ function syncPlayerWithECS(): void {
   // Transform.x[playerEntityId] = playerPos.x;
   // Transform.y[playerEntityId] = playerPos.y;
   // Transform.z[playerEntityId] = playerPos.z;
+}
+
+/**
+ * Toggle the visibility of ECS entities
+ * @param visible Whether ECS entities should be visible
+ */
+export function setEcsEntitiesVisible(visible: boolean): void {
+  showEcsEntities = visible;
+  console.log(`ECS entities are now ${visible ? 'visible' : 'hidden'}`);
 }
 
 /**

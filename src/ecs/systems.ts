@@ -132,6 +132,12 @@ const materialRegistry: Record<number, THREE.Material | (() => THREE.Material)> 
 const entityMeshes = new Map<number, THREE.Mesh>();
 
 /**
+ * Flag to control whether ECS entities are visible
+ * Set to false to hide ECS entities while we're transitioning to ECS
+ */
+export let showEcsEntities = false;
+
+/**
  * Render system
  * Updates the visual representation of entities
  */
@@ -178,6 +184,9 @@ export function renderSystem(world: IWorld, dt: number, scene: THREE.Scene) {
 
     // Set initial rotation
     mesh.rotation.y = Transform.rotY[entity];
+
+    // Set visibility based on the showEcsEntities flag
+    mesh.visible = showEcsEntities;
 
     // Add to scene
     scene.add(mesh);
