@@ -42,6 +42,11 @@ yarn-error.log*
 # Coverage reports
 /coverage/
 
+# Yarn droppings
+.yarn/install-state.gz
+.yarn/
+.pnp.*
+.yarnrc.yml
+
 # System Files
 Thumbs.db
-.yarn/install-state.gz
