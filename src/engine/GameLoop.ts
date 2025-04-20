@@ -14,7 +14,6 @@ const FRAME_TIME = 1000 / TARGET_FPS; // Time per frame in ms
 // Game state
 let isRunning = false;
 let lastTime = 0;
-let lastFrameTime = 0;
 let accumulator = 0;
 
 /**
@@ -52,24 +51,14 @@ export function initGameEngine() {
   });
 }
 
+// Track frame limiting
+let frameId: number | null = null;
+
 /**
  * Main game loop
  */
 function gameLoop(timestamp: number) {
   if (!isRunning) return;
-
-  // Frame limiting logic
-  const currentFrameTime = timestamp;
-  const elapsed = currentFrameTime - lastFrameTime;
-
-  // If we're running faster than our target FPS, delay the next frame
-  if (elapsed < FRAME_TIME) {
-    requestAnimationFrame(gameLoop);
-    return;
-  }
-
-  // Update last frame time, accounting for the delay
-  lastFrameTime = currentFrameTime - (elapsed % FRAME_TIME);
 
   // Calculate delta time
   const now = timestamp / 1000; // Convert to seconds
@@ -88,8 +77,25 @@ function gameLoop(timestamp: number) {
   // Render with interpolation
   render(accumulator / FIXED_TIMESTEP);
 
-  // Schedule next frame
-  requestAnimationFrame(gameLoop);
+  // Calculate how long this frame took
+  const frameEndTime = performance.now();
+  const frameDuration = frameEndTime - timestamp;
+
+  // Calculate delay needed to maintain target frame rate
+  const delay = Math.max(0, FRAME_TIME - frameDuration);
+
+  // Schedule next frame with proper timing
+  if (isRunning) {
+    // Clear any existing frame request
+    if (frameId !== null) {
+      cancelAnimationFrame(frameId);
+    }
+
+    // Use setTimeout for frame limiting, then requestAnimationFrame for the actual rendering
+    setTimeout(() => {
+      frameId = requestAnimationFrame(gameLoop);
+    }, delay);
+  }
 }
 
 /**
@@ -173,6 +179,12 @@ function updateDevOverlay(stats: any) {
  */
 export function pauseGame() {
   isRunning = false;
+
+  // Cancel any pending frame requests
+  if (frameId !== null) {
+    cancelAnimationFrame(frameId);
+    frameId = null;
+  }
 }
 
 /**
@@ -183,7 +195,6 @@ export function resumeGame() {
     isRunning = true;
     const now = performance.now();
     lastTime = now / 1000;
-    lastFrameTime = now;
-    requestAnimationFrame(gameLoop);
+    frameId = requestAnimationFrame(gameLoop);
   }
 }

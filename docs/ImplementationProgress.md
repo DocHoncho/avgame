@@ -82,7 +82,7 @@
 - **2025-04-19:** Fixed movement controls to properly align with camera direction
 - **2025-04-19:** Simplified camera system by locking to North (-Z) orientation
 - **2025-04-19:** Fixed movement direction and standardized on X/Z coordinates
-- **2025-04-19:** Added frame rate limiter to lock game at 60 FPS
+- **2025-04-19:** Added frame rate limiter to lock game at 60 FPS using setTimeout + requestAnimationFrame
 
 ---
 
