@@ -40,10 +40,18 @@
 
 ---
 
-## Upcoming Phases
+## Current Phase
 
-### Phase 3 – Grid System & Level Assembly ⏳
+### Phase 3 – Grid System & Level Assembly 🔄
 > *Goal:* walk seamlessly through a stitched level of 4 rooms.
+
+| Task | Status | Notes |
+|------|--------|-------|
+| **GridSystem Implementation** | 🔄 In Progress | Tile flags, LOS ray, A* path-finding, room-prefab loader |
+| **Chunk Streaming** | 🕒 Planned | Load next 32×32 tile chunk on proximity; unload last |
+| **Collider Builder** | 🕒 Planned | Rectangle merge for optimized collisions |
+
+## Upcoming Phases
 
 ### Phase 4 – ECS Feature Pack & State Sync ⏳
 > *Goal:* solid data pipeline for future mechanics.
@@ -91,7 +99,8 @@
 - **2025-04-20:** Enhanced test room with two chambers connected by a doorway and added standalone obstacle tiles
 - **2025-04-20:** Implemented basic ECS integration with bitecs library, including Transform, Velocity, Collider, and Renderable components
 - **2025-04-20:** Added toggle for ECS entity visualization (press E to toggle)
+- **2025-04-20:** Completed Phase 2 and started Phase 3 - Grid System & Level Assembly
 
 ---
 
-*Last updated: 2025-04-20*
+*Last updated: 2025-04-21*

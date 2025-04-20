@@ -135,6 +135,6 @@
 ---
 
 ## Current Focus
-1. **Phase 2: Input + Collision** groundwork — capsule movement vs. rect merge.
+1. **Phase 3: GridSystem Implementation** — Tile flags, LOS ray, A* path-finding, and room-prefab loader with doorway stitching.
 
 Stay narrow, get visible results, iterate fast.
