@@ -14,6 +14,7 @@ export enum InputAction {
   // Camera
   ROTATE_CAMERA_LEFT = 'ROTATE_CAMERA_LEFT',
   ROTATE_CAMERA_RIGHT = 'ROTATE_CAMERA_RIGHT',
+  ROTATE_CAMERA = 'ROTATE_CAMERA', // Middle mouse button for camera rotation
 
   // Actions
   PRIMARY_ACTION = 'PRIMARY_ACTION',
@@ -50,6 +51,10 @@ interface InputAxes {
 interface MouseState {
   x: number;
   y: number;
+  prevX: number; // Previous X position for calculating delta
+  prevY: number; // Previous Y position for calculating delta
+  deltaX: number; // Change in X position since last frame
+  deltaY: number; // Change in Y position since last frame
   worldX: number;
   worldY: number;
   worldZ: number;
@@ -73,6 +78,8 @@ export class InputManager {
   private axes: InputAxes = { moveX: 0, moveY: 0, aimX: 0, aimZ: 0 };
   private mouse: MouseState = {
     x: 0, y: 0,
+    prevX: 0, prevY: 0,
+    deltaX: 0, deltaY: 0,
     worldX: 0, worldY: 0, worldZ: 0,
     isOnScreen: false
   };
@@ -184,9 +191,18 @@ export class InputManager {
    * Handle mouse movement
    */
   private handleMouseMove(event: MouseEvent): void {
+    // Store previous position
+    this.mouse.prevX = this.mouse.x;
+    this.mouse.prevY = this.mouse.y;
+
+    // Update current position
     this.mouse.x = event.clientX;
     this.mouse.y = event.clientY;
     this.mouse.isOnScreen = true;
+
+    // Calculate delta (will be reset in update)
+    this.mouse.deltaX = this.mouse.x - this.mouse.prevX;
+    this.mouse.deltaY = this.mouse.y - this.mouse.prevY;
 
     // World position will be calculated in the update method
     // after we have access to the camera and renderer
@@ -198,6 +214,8 @@ export class InputManager {
   private handleMouseDown(event: MouseEvent): void {
     if (event.button === 0) { // Left click
       this.setActionState(InputAction.PRIMARY_ACTION, true);
+    } else if (event.button === 1) { // Middle click
+      this.setActionState(InputAction.ROTATE_CAMERA, true);
     } else if (event.button === 2) { // Right click
       this.setActionState(InputAction.SECONDARY_ACTION, true);
     }
@@ -209,6 +227,8 @@ export class InputManager {
   private handleMouseUp(event: MouseEvent): void {
     if (event.button === 0) { // Left click
       this.setActionState(InputAction.PRIMARY_ACTION, false);
+    } else if (event.button === 1) { // Middle click
+      this.setActionState(InputAction.ROTATE_CAMERA, false);
     } else if (event.button === 2) { // Right click
       this.setActionState(InputAction.SECONDARY_ACTION, false);
     }
@@ -271,6 +291,10 @@ export class InputManager {
     // Update mouse world position
     this.updateMouseWorldPosition();
 
+    // Reset mouse delta after it's been processed
+    this.mouse.deltaX = 0;
+    this.mouse.deltaY = 0;
+
     // Additional processing that needs to happen every frame
     // (e.g., gamepad polling)
   }
@@ -294,6 +318,13 @@ export class InputManager {
    */
   public getMousePosition(): { x: number, y: number } {
     return { x: this.mouse.x, y: this.mouse.y };
+  }
+
+  /**
+   * Get the mouse movement delta
+   */
+  public getMouseDelta(): { x: number, y: number } {
+    return { x: this.mouse.deltaX, y: this.mouse.deltaY };
   }
 
   /**

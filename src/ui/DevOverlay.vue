@@ -22,6 +22,7 @@
     <div class="controls">
       <div class="control">WASD - Move Player</div>
       <div class="control">Mouse - Aim</div>
+      <div class="control">Middle Mouse - Rotate Camera</div>
       <div class="control">P - Pause Game</div>
     </div>
   </div>

@@ -1,7 +1,7 @@
 import { getRenderer, initRenderer } from './Renderer';
 import { eventBus, SessionEventType } from '../state/events';
 import { useAppStore } from '../state/appStore';
-import { inputManager } from './InputManager';
+import { inputManager, InputAction } from './InputManager';
 import { initPlayer, getPlayer } from './Player';
 import { initAimIndicator, getAimIndicator } from './AimIndicator';
 
@@ -107,7 +107,14 @@ function fixedUpdate(dt: number) {
   const playerPos = player.getPosition();
   renderer.camera.setTarget(playerPos.x, playerPos.y, playerPos.z);
 
-  // Camera is locked to North (-Z axis)
+  // Handle camera rotation with middle mouse button
+  if (inputManager.isActionActive(InputAction.ROTATE_CAMERA)) {
+    const mouseDelta = inputManager.getMouseDelta();
+    // Rotate camera based on mouse X movement
+    // Negative multiplier to make left movement rotate counter-clockwise
+    const rotationSpeed = 0.005;
+    renderer.camera.rotate(-mouseDelta.x * rotationSpeed);
+  }
 }
 
 /**
