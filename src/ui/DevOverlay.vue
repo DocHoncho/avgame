@@ -2,7 +2,7 @@
   <!-- Upper left: Stats and player position -->
   <div class="dev-overlay top-left">
     <div class="stats">
-      <div class="stat">FPS: {{ stats.fps }}</div>
+      <div class="stat">FPS: {{ stats.fps }}/{{ stats.targetFps }}</div>
       <div class="stat">Frame: {{ stats.frameTime }} ms</div>
       <div class="stat">Draws: {{ stats.drawCalls }}</div>
       <div class="stat-divider"></div>

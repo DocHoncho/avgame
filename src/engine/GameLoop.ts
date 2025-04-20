@@ -8,10 +8,13 @@ import { initAimIndicator, getAimIndicator } from './AimIndicator';
 // Game loop configuration
 const FIXED_TIMESTEP = 1 / 60; // 60 updates per second
 const MAX_FRAME_TIME = 0.25; // Maximum frame time to prevent spiral of death
+const TARGET_FPS = 60; // Target frame rate
+const FRAME_TIME = 1000 / TARGET_FPS; // Time per frame in ms
 
 // Game state
 let isRunning = false;
 let lastTime = 0;
+let lastFrameTime = 0;
 let accumulator = 0;
 
 /**
@@ -54,6 +57,19 @@ export function initGameEngine() {
  */
 function gameLoop(timestamp: number) {
   if (!isRunning) return;
+
+  // Frame limiting logic
+  const currentFrameTime = timestamp;
+  const elapsed = currentFrameTime - lastFrameTime;
+
+  // If we're running faster than our target FPS, delay the next frame
+  if (elapsed < FRAME_TIME) {
+    requestAnimationFrame(gameLoop);
+    return;
+  }
+
+  // Update last frame time, accounting for the delay
+  lastFrameTime = currentFrameTime - (elapsed % FRAME_TIME);
 
   // Calculate delta time
   const now = timestamp / 1000; // Convert to seconds
@@ -121,6 +137,7 @@ function updateDevOverlay(stats: any) {
   window.dispatchEvent(new CustomEvent('dev-stats-update', {
     detail: {
       fps,
+      targetFps: TARGET_FPS,
       frameTime: stats.frameTime.toFixed(2),
       drawCalls: stats.drawCalls
     }
@@ -164,7 +181,9 @@ export function pauseGame() {
 export function resumeGame() {
   if (!isRunning) {
     isRunning = true;
-    lastTime = performance.now() / 1000;
+    const now = performance.now();
+    lastTime = now / 1000;
+    lastFrameTime = now;
     requestAnimationFrame(gameLoop);
   }
 }
