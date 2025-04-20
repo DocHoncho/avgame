@@ -84,9 +84,13 @@ export class Player {
 
     // We need to map our WASD inputs to the world coordinates based on camera angle
     // First, we'll determine the forward and right vectors based on camera angle
+    // For our coordinate system (North = -Z, East = +X):
+    // When camera angle is PI/2 (North), forward should be (0, -1)
+    // When camera angle is 0 (East), forward should be (1, 0)
     const forwardX = Math.sin(cameraAngle);  // X component of forward vector
     const forwardZ = -Math.cos(cameraAngle); // Z component of forward vector
 
+    // Right vector is perpendicular to forward (90 degrees clockwise)
     const rightX = Math.cos(cameraAngle);    // X component of right vector
     const rightZ = Math.sin(cameraAngle);    // Z component of right vector
 
@@ -95,6 +99,11 @@ export class Player {
     // Left/right movement (A/D) uses the right vector
     const worldX = (inputY * forwardX) + (inputX * rightX);
     const worldZ = (inputY * forwardZ) + (inputX * rightZ);
+
+    // Debug output
+    if (inputX !== 0 || inputY !== 0) {
+      console.log(`Input: (${inputX}, ${inputY}), World: (${worldX.toFixed(2)}, ${worldZ.toFixed(2)})`);
+    }
 
     return { x: worldX, z: worldZ };
   }

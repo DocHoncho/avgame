@@ -85,6 +85,7 @@ export function initGameEngine() {
 
       // Debug output
       console.log(`Rotating from ${['North', 'East', 'South', 'West'][currentCardinal]} to ${['North', 'East', 'South', 'West'][nextCardinal]}`);
+      console.log(`Camera angle: ${(currentAngle * 180 / Math.PI).toFixed(0)}° -> ${(renderer.camera.getRotationAngle() * 180 / Math.PI).toFixed(0)}°`);
     }
   });
 }
