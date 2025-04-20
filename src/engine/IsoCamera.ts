@@ -15,7 +15,7 @@ export class IsoCamera {
 
   // Camera position in spherical coordinates
   private distance = 20;
-  private rotationAngle = Math.PI / 2; // Default to looking north (-Z axis)
+  private rotationAngle = Math.PI / 2; // Fixed to looking north (-Z axis)
   private elevationAngle = Math.PI / 6; // 30 degrees
 
   // Camera limits
@@ -46,10 +46,10 @@ export class IsoCamera {
   }
 
   /**
-   * Rotate the camera around the target
+   * Rotate the camera around the target (disabled - camera locked to North)
    */
   rotate(deltaAngle: number) {
-    this.rotationAngle += deltaAngle;
+    // Camera rotation disabled - always pointing North
     this.updatePosition();
   }
 
@@ -94,15 +94,11 @@ export class IsoCamera {
   }
 
   /**
-   * Snap to one of the four cardinal isometric views
+   * Snap to one of the four cardinal isometric views (disabled - camera locked to North)
    * @param index 0=North, 1=East, 2=South, 3=West
    */
   snapToCardinal(index: number) {
-    // Define the angles for each cardinal direction based on Three.js coordinates
-    // North = PI/2 (looking at -Z), East = 0 (looking at +X)
-    // South = 3PI/2 (looking at +Z), West = PI (looking at -X)
-    const angles = [Math.PI/2, 0, 3*Math.PI/2, Math.PI];
-    this.rotationAngle = angles[index % 4];
+    // Camera rotation disabled - always pointing North
     this.updatePosition();
   }
 

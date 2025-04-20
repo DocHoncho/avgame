@@ -61,49 +61,21 @@ export class Player {
   }
 
   /**
-   * Transform input axes based on camera rotation
-   * This makes WASD movement relative to the camera view
-   * W always moves in the direction the camera is facing
+   * Transform input axes based on fixed camera orientation
+   * Camera is locked to North (-Z axis)
    */
   private transformInputAxes(inputX: number, inputY: number): { x: number, z: number } {
-    // Get the camera rotation angle
-    const renderer = getRenderer();
-    const cameraAngle = renderer.camera.getRotationAngle();
-
-    // For our control scheme:
-    // - W (inputY = 1) should move in the direction the camera is facing
-    // - A (inputX = -1) should move left relative to camera
-    // - S (inputY = -1) should move backward relative to camera
-    // - D (inputX = 1) should move right relative to camera
-
-    // In Three.js, the camera rotation works as follows (based on our coordinate system):
-    // - PI/2 radians: Camera looks north (-Z axis)
-    // - 0 radians: Camera looks east (+X axis)
-    // - 3PI/2 radians: Camera looks south (+Z axis)
-    // - PI radians: Camera looks west (-X axis)
-
-    // We need to map our WASD inputs to the world coordinates based on camera angle
-    // First, we'll determine the forward and right vectors based on camera angle
     // For our coordinate system (North = -Z, East = +X):
-    // When camera angle is PI/2 (North), forward should be (0, -1)
-    // When camera angle is 0 (East), forward should be (1, 0)
-    const forwardX = Math.sin(cameraAngle);  // X component of forward vector
-    const forwardZ = -Math.cos(cameraAngle); // Z component of forward vector
+    // - W (inputY = 1) moves North (-Z)
+    // - S (inputY = -1) moves South (+Z)
+    // - A (inputX = -1) moves West (-X)
+    // - D (inputX = 1) moves East (+X)
 
-    // Right vector is perpendicular to forward (90 degrees clockwise)
-    const rightX = Math.cos(cameraAngle);    // X component of right vector
-    const rightZ = Math.sin(cameraAngle);    // Z component of right vector
-
-    // Now combine the forward and right vectors based on input
-    // Forward/backward movement (W/S) uses the forward vector
-    // Left/right movement (A/D) uses the right vector
-    const worldX = (inputY * forwardX) + (inputX * rightX);
-    const worldZ = (inputY * forwardZ) + (inputX * rightZ);
-
-    // Debug output
-    if (inputX !== 0 || inputY !== 0) {
-      console.log(`Input: (${inputX}, ${inputY}), World: (${worldX.toFixed(2)}, ${worldZ.toFixed(2)})`);
-    }
+    // Since camera is fixed pointing North (-Z):
+    // Forward/backward (W/S) maps directly to Z axis (negative for forward)
+    // Left/right (A/D) maps directly to X axis
+    const worldX = inputX;
+    const worldZ = -inputY; // Negative because forward (North) is -Z
 
     return { x: worldX, z: worldZ };
   }

@@ -80,6 +80,7 @@
 - **2025-04-19:** Fixed coordinate system to use North (-Z), East (+X), South (+Z), West (-X)
 - **2025-04-19:** Improved DevOverlay layout with player coordinates and repositioned elements
 - **2025-04-19:** Fixed movement controls to properly align with camera direction
+- **2025-04-19:** Simplified camera system by locking to North (-Z) orientation
 
 ---
 
