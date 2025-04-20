@@ -19,7 +19,7 @@ export interface Capsule {
 
 /**
  * Collision System
- * 
+ *
  * Handles collision detection and resolution between entities in the game.
  */
 export class CollisionSystem {
@@ -55,16 +55,16 @@ export class CollisionSystem {
 
     // Create a matrix to store each instance's transform
     const matrix = new THREE.Matrix4();
-    
+
     // Process each wall instance
     for (let i = 0; i < wallInstances.count; i++) {
       // Get the transform matrix for this instance
       wallInstances.getMatrixAt(i, matrix);
-      
+
       // Extract position from matrix
       const position = new THREE.Vector3();
       position.setFromMatrixPosition(matrix);
-      
+
       // Create an AABB for this wall
       // The wall is centered at its position, so we need to calculate min/max
       const halfSize = tileSize / 2;
@@ -73,17 +73,17 @@ export class CollisionSystem {
         position.y - 0.5, // Wall height is 1.0, centered at y=0.5
         position.z - halfSize
       );
-      
+
       const max = new THREE.Vector3(
         position.x + halfSize,
         position.y + 0.5,
         position.z + halfSize
       );
-      
+
       // Add the collider
       this.addStaticCollider({ min, max });
     }
-    
+
     console.log(`Generated ${this.staticColliders.length} wall colliders`);
   }
 
@@ -108,10 +108,10 @@ export class CollisionSystem {
       Math.max(aabb.min.y, Math.min(center.y, aabb.max.y)),
       Math.max(aabb.min.z, Math.min(center.z, aabb.max.z))
     );
-    
+
     // Calculate squared distance between the closest point and sphere center
     const distanceSquared = closestPoint.distanceToSquared(center);
-    
+
     // If the distance is less than the radius squared, they intersect
     return distanceSquared <= (radius * radius);
   }
@@ -130,60 +130,113 @@ export class CollisionSystem {
 
   /**
    * Check if a capsule would intersect with any static collider after moving
-   * @returns The collider that would be intersected, or null if no collision
+   * @returns Array of colliders that would be intersected
    */
-  public checkCapsuleCollision(capsule: Capsule): AABB | null {
+  public checkCapsuleCollision(capsule: Capsule): AABB[] {
+    const collisions: AABB[] = [];
+
     for (const collider of this.staticColliders) {
       if (this.capsuleIntersectsAABB(capsule, collider)) {
-        return collider;
+        collisions.push(collider);
       }
     }
-    return null;
+
+    return collisions;
   }
 
   /**
-   * Resolve a collision between a capsule and an AABB by calculating a sliding vector
+   * Resolve collisions between a capsule and multiple AABBs by calculating a sliding vector
    * @param capsule The capsule collider
    * @param velocity The current velocity vector
-   * @param collider The AABB collider that was hit
-   * @returns A modified velocity vector that slides along the surface
+   * @param colliders Array of AABB colliders that were hit
+   * @returns A modified velocity vector that slides along the surfaces
+   */
+  public resolveCollisions(
+    capsule: Capsule,
+    velocity: THREE.Vector3,
+    colliders: AABB[]
+  ): THREE.Vector3 {
+    if (colliders.length === 0) {
+      return velocity.clone();
+    }
+
+    // Create a copy of the velocity to modify
+    let newVelocity = velocity.clone();
+
+    // Handle each collider
+    for (const collider of colliders) {
+      // Find the closest point on the AABB to the capsule center
+      const closestPoint = new THREE.Vector3(
+        Math.max(collider.min.x, Math.min(capsule.start.x, collider.max.x)),
+        Math.max(collider.min.y, Math.min(capsule.start.y, collider.max.y)),
+        Math.max(collider.min.z, Math.min(capsule.start.z, collider.max.z))
+      );
+
+      // Calculate the penetration vector (from closest point to capsule center)
+      const penetration = new THREE.Vector3().subVectors(capsule.start, closestPoint);
+      const penetrationDistance = penetration.length();
+
+      // If we're actually penetrating (accounting for radius)
+      if (penetrationDistance < capsule.radius) {
+        // Normalize the penetration vector
+        if (penetrationDistance > 0) {
+          penetration.normalize();
+        } else {
+          // If penetration distance is 0 (rare case), use a default direction
+          // This happens when the capsule center is exactly on the AABB surface
+          penetration.set(1, 0, 0);
+        }
+
+        // Calculate the dot product of velocity and penetration
+        const dot = newVelocity.dot(penetration);
+
+        // If the dot product is negative, the velocity is going into the collider
+        if (dot < 0) {
+          // Project the velocity onto the penetration vector
+          const projection = penetration.clone().multiplyScalar(dot);
+
+          // Subtract the projection from the velocity to get the sliding vector
+          newVelocity.sub(projection);
+
+          // Add a small push-out vector to prevent sticking to walls
+          const pushFactor = 0.01; // Small push to prevent sticking
+          const pushVector = penetration.clone().multiplyScalar(pushFactor);
+          newVelocity.add(pushVector);
+        }
+      }
+    }
+
+    // For corner cases, if we have multiple collisions and the resulting velocity is very small,
+    // we might be stuck. In that case, add a small push-out vector in the average direction
+    if (colliders.length > 1 && newVelocity.lengthSq() < 0.01) {
+      // Calculate average push direction from all colliders
+      const avgPushDir = new THREE.Vector3();
+
+      for (const collider of colliders) {
+        const center = new THREE.Vector3().addVectors(collider.min, collider.max).multiplyScalar(0.5);
+        const pushDir = new THREE.Vector3().subVectors(capsule.start, center).normalize();
+        avgPushDir.add(pushDir);
+      }
+
+      if (avgPushDir.lengthSq() > 0) {
+        avgPushDir.normalize().multiplyScalar(0.05); // Small push
+        newVelocity.add(avgPushDir);
+      }
+    }
+
+    return newVelocity;
+  }
+
+  /**
+   * Legacy method for backward compatibility
+   * @deprecated Use resolveCollisions instead
    */
   public resolveCollision(
-    capsule: Capsule, 
-    velocity: THREE.Vector3, 
+    capsule: Capsule,
+    velocity: THREE.Vector3,
     collider: AABB
   ): THREE.Vector3 {
-    // Create a copy of the velocity to modify
-    const newVelocity = velocity.clone();
-    
-    // Find the closest point on the AABB to the capsule center (we'll use start for simplicity)
-    const closestPoint = new THREE.Vector3(
-      Math.max(collider.min.x, Math.min(capsule.start.x, collider.max.x)),
-      Math.max(collider.min.y, Math.min(capsule.start.y, collider.max.y)),
-      Math.max(collider.min.z, Math.min(capsule.start.z, collider.max.z))
-    );
-    
-    // Calculate the penetration vector (from closest point to capsule center)
-    const penetration = new THREE.Vector3().subVectors(capsule.start, closestPoint);
-    
-    // Normalize the penetration vector
-    if (penetration.lengthSq() > 0) {
-      penetration.normalize();
-    }
-    
-    // Calculate the dot product of velocity and penetration
-    const dot = newVelocity.dot(penetration);
-    
-    // If the dot product is negative, the velocity is going into the collider
-    if (dot < 0) {
-      // Project the velocity onto the penetration vector
-      const projection = penetration.multiplyScalar(dot);
-      
-      // Subtract the projection from the velocity to get the sliding vector
-      newVelocity.sub(projection);
-    }
-    
-    return newVelocity;
+    return this.resolveCollisions(capsule, velocity, [collider]);
   }
 
   /**
@@ -191,6 +244,82 @@ export class CollisionSystem {
    */
   public getStaticColliders(): AABB[] {
     return this.staticColliders;
+  }
+
+  /**
+   * Create debug visualization for colliders
+   * @param scene The Three.js scene to add the visualization to
+   */
+  public createDebugVisualization(scene: THREE.Scene): void {
+    // Remove any existing debug visualization
+    this.removeDebugVisualization(scene);
+
+    // Create a wireframe material for the debug visualization
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xff0000,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.5
+    });
+
+    // Create a box for each collider
+    for (const collider of this.staticColliders) {
+      // Calculate the size and position of the box
+      const size = new THREE.Vector3().subVectors(collider.max, collider.min);
+      const position = new THREE.Vector3().addVectors(collider.min, collider.max).multiplyScalar(0.5);
+
+      // Create the box geometry
+      const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
+
+      // Create the mesh
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.copy(position);
+      mesh.name = 'debug-collider';
+
+      // Add the mesh to the scene
+      scene.add(mesh);
+    }
+
+    console.log(`Created debug visualization for ${this.staticColliders.length} colliders`);
+  }
+
+  /**
+   * Remove debug visualization from the scene
+   * @param scene The Three.js scene to remove the visualization from
+   */
+  public removeDebugVisualization(scene: THREE.Scene): void {
+    // Find and remove all debug collider meshes
+    const toRemove: THREE.Object3D[] = [];
+
+    scene.traverse((object) => {
+      if (object.name === 'debug-collider') {
+        toRemove.push(object);
+      }
+    });
+
+    for (const object of toRemove) {
+      scene.remove(object);
+
+      // Dispose of geometry and material
+      if (object instanceof THREE.Mesh) {
+        if (object.geometry) {
+          object.geometry.dispose();
+        }
+        if (object.material) {
+          if (Array.isArray(object.material)) {
+            for (const material of object.material) {
+              material.dispose();
+            }
+          } else {
+            object.material.dispose();
+          }
+        }
+      }
+    }
+
+    if (toRemove.length > 0) {
+      console.log(`Removed ${toRemove.length} debug collider visualizations`);
+    }
   }
 }
 

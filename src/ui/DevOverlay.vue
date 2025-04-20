@@ -27,6 +27,10 @@
       <div class="control">Mouse - Aim</div>
       <div class="control">Middle Mouse - Rotate Camera</div>
       <div class="control">P - Pause Game</div>
+      <div class="control-divider"></div>
+      <div class="control debug">Debug Controls:</div>
+      <div class="control debug">C - Toggle Collider Visualization</div>
+      <div class="control debug">F12 - Toggle Debug Overlay</div>
     </div>
   </div>
 </template>
@@ -123,6 +127,18 @@ onUnmounted(() => {
 .control {
   margin-top: 5px;
   opacity: 0.8;
+}
+
+.control-divider {
+  height: 1px;
+  background-color: #0af;
+  opacity: 0.5;
+  margin: 8px 0;
+}
+
+.control.debug {
+  color: #ff9900;
+  opacity: 0.9;
 }
 
 .visualizer-container {

@@ -20,6 +20,9 @@ let accumulator = 0;
 let lastLogTime = 0;
 const LOG_INTERVAL = 1000; // Log every 1 second
 
+// Debug visualization
+let showColliders = false;
+
 /**
  * Initialize the game engine
  */
@@ -60,6 +63,21 @@ export function initGameEngine() {
       isRunning = !isRunning;
       if (isRunning) {
         resumeGame();
+      }
+    }
+
+    // Toggle collider visualization with C key
+    if (e.key === 'c') {
+      showColliders = !showColliders;
+      const renderer = getRenderer();
+      const collisionSystem = getCollisionSystem();
+
+      if (showColliders) {
+        collisionSystem.createDebugVisualization(renderer.scene);
+        console.log('Collider visualization enabled');
+      } else {
+        collisionSystem.removeDebugVisualization(renderer.scene);
+        console.log('Collider visualization disabled');
       }
     }
   });

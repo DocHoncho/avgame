@@ -195,11 +195,19 @@ export class Player {
     const capsule = this.createCapsuleCollider(position);
 
     // Check for collisions
-    const collider = collisionSystem.checkCapsuleCollision(capsule);
+    const colliders = collisionSystem.checkCapsuleCollision(capsule);
 
-    if (collider) {
-      // Collision detected, resolve it
-      const newVelocity = collisionSystem.resolveCollision(capsule, this.velocity, collider);
+    if (colliders.length > 0) {
+      // Collisions detected, resolve them
+      const newVelocity = collisionSystem.resolveCollisions(capsule, this.velocity, colliders);
+
+      // Debug log for collisions (only occasionally to avoid spam)
+      if (Math.random() < 0.05) {
+        console.log(`Collision detected with ${colliders.length} colliders. ` +
+                    `Original velocity: (${this.velocity.x.toFixed(2)}, ${this.velocity.z.toFixed(2)}), ` +
+                    `New velocity: (${newVelocity.x.toFixed(2)}, ${newVelocity.z.toFixed(2)})`);
+      }
+
       return { collision: true, newVelocity };
     }
 
@@ -208,16 +216,16 @@ export class Player {
   }
 
   /**
-   * Check collision with other objects
+   * Check if the player is currently colliding with any objects
    */
-  public checkCollision(objects: THREE.Object3D[]): boolean {
+  public isColliding(): boolean {
     // Create a capsule collider at the current position
     const capsule = this.createCapsuleCollider(this.position);
 
     // Check for collisions with static colliders
-    const collider = getCollisionSystem().checkCapsuleCollision(capsule);
+    const colliders = getCollisionSystem().checkCapsuleCollision(capsule);
 
-    return collider !== null;
+    return colliders.length > 0;
   }
 }
 
