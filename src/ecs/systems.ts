@@ -1,4 +1,7 @@
-import { IWorld, defineQuery, enterQuery, exitQuery } from 'bitecs';
+import * as bitecs from 'bitecs';
+
+const { defineQuery, enterQuery, exitQuery } = bitecs;
+type IWorld = ReturnType<typeof bitecs.createWorld>;
 import { Transform, Velocity, Collider, Renderable, CollisionFlags } from './components';
 import * as THREE from 'three';
 import { getCollisionSystem, Capsule } from '../engine/CollisionSystem';
@@ -34,14 +37,14 @@ const exitRenderableQuery = exitQuery(renderableQuery);
  */
 export function movementSystem(world: IWorld, dt: number) {
   const entities = movementQuery(world);
-  
+
   for (const entity of entities) {
     // Apply velocity to position
     Transform.x[entity] += Velocity.dx[entity] * dt;
     Transform.y[entity] += Velocity.dy[entity] * dt;
     Transform.z[entity] += Velocity.dz[entity] * dt;
   }
-  
+
   return world;
 }
 
@@ -52,18 +55,18 @@ export function movementSystem(world: IWorld, dt: number) {
 export function collisionSystem(world: IWorld, dt: number) {
   const entities = collisionQuery(world);
   const collisionSys = getCollisionSystem();
-  
+
   for (const entity of entities) {
     // Skip static entities
     if (Collider.flags[entity] & CollisionFlags.STATIC) {
       continue;
     }
-    
+
     // Skip entities without velocity
     if (!Velocity.dx[entity] && !Velocity.dy[entity] && !Velocity.dz[entity]) {
       continue;
     }
-    
+
     // Create a capsule collider for the entity
     const capsule: Capsule = {
       start: new THREE.Vector3(
@@ -78,10 +81,10 @@ export function collisionSystem(world: IWorld, dt: number) {
       ),
       radius: Collider.radius[entity]
     };
-    
+
     // Check for collisions
     const colliders = collisionSys.checkCapsuleCollision(capsule);
-    
+
     if (colliders.length > 0) {
       // Create a velocity vector
       const velocity = new THREE.Vector3(
@@ -89,17 +92,17 @@ export function collisionSystem(world: IWorld, dt: number) {
         Velocity.dy[entity],
         Velocity.dz[entity]
       );
-      
+
       // Resolve collisions
       const newVelocity = collisionSys.resolveCollisions(capsule, velocity, colliders);
-      
+
       // Update entity velocity
       Velocity.dx[entity] = newVelocity.x;
       Velocity.dy[entity] = newVelocity.y;
       Velocity.dz[entity] = newVelocity.z;
     }
   }
-  
+
   return world;
 }
 
@@ -138,7 +141,7 @@ export function renderSystem(world: IWorld, dt: number, scene: THREE.Scene) {
   for (const entity of newRenderables) {
     const meshType = Renderable.meshType[entity];
     const materialType = Renderable.materialType[entity];
-    
+
     // Get or create geometry
     let geometry: THREE.BufferGeometry;
     const meshDef = meshRegistry[meshType];
@@ -149,7 +152,7 @@ export function renderSystem(world: IWorld, dt: number, scene: THREE.Scene) {
     } else {
       geometry = meshRegistry[0] as THREE.BufferGeometry; // Default
     }
-    
+
     // Get or create material
     let material: THREE.Material;
     const materialDef = materialRegistry[materialType];
@@ -160,29 +163,29 @@ export function renderSystem(world: IWorld, dt: number, scene: THREE.Scene) {
     } else {
       material = materialRegistry[0] as THREE.Material; // Default
     }
-    
+
     // Create mesh
     const mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    
+
     // Set initial position
     mesh.position.set(
       Transform.x[entity],
       Transform.y[entity],
       Transform.z[entity]
     );
-    
+
     // Set initial rotation
     mesh.rotation.y = Transform.rotY[entity];
-    
+
     // Add to scene
     scene.add(mesh);
-    
+
     // Store reference
     entityMeshes.set(entity, mesh);
   }
-  
+
   // Update positions and rotations of all renderable entities
   const renderables = renderableQuery(world);
   for (const entity of renderables) {
@@ -194,12 +197,12 @@ export function renderSystem(world: IWorld, dt: number, scene: THREE.Scene) {
         Transform.y[entity],
         Transform.z[entity]
       );
-      
+
       // Update rotation
       mesh.rotation.y = Transform.rotY[entity];
     }
   }
-  
+
   // Handle entities that lost renderable components
   const removedRenderables = exitRenderableQuery(world);
   for (const entity of removedRenderables) {
@@ -207,12 +210,12 @@ export function renderSystem(world: IWorld, dt: number, scene: THREE.Scene) {
     if (mesh) {
       // Remove from scene
       scene.remove(mesh);
-      
+
       // Dispose of geometry and material
       if (mesh.geometry) {
         mesh.geometry.dispose();
       }
-      
+
       if (mesh.material) {
         if (Array.isArray(mesh.material)) {
           for (const material of mesh.material) {
@@ -222,11 +225,11 @@ export function renderSystem(world: IWorld, dt: number, scene: THREE.Scene) {
           mesh.material.dispose();
         }
       }
-      
+
       // Remove reference
       entityMeshes.delete(entity);
     }
   }
-  
+
   return world;
 }

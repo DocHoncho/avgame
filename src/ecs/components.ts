@@ -1,10 +1,11 @@
-import { 
-  defineComponent, 
-  Types,
-  addComponent
-} from 'bitecs';
+import * as bitecs from 'bitecs';
 
-const { f32, u8, u16 } = Types;
+const {
+  defineComponent,
+  addComponent
+} = bitecs;
+
+const { f32, u8, u16 } = bitecs.Types;
 
 /**
  * Transform component
@@ -72,62 +73,98 @@ export const CollisionFlags = {
  * Helper function to add a Transform component to an entity
  */
 export function addTransform(
-  entity: number, 
-  x = 0, 
-  y = 0, 
-  z = 0, 
+  entity: number,
+  x = 0,
+  y = 0,
+  z = 0,
   rotY = 0
 ) {
-  addComponent(Transform, entity);
-  Transform.x[entity] = x;
-  Transform.y[entity] = y;
-  Transform.z[entity] = z;
-  Transform.rotY[entity] = rotY;
-  return entity;
+  if (entity === undefined) {
+    throw new Error('Cannot add Transform component to undefined entity');
+  }
+
+  try {
+    addComponent(Transform, entity);
+    Transform.x[entity] = x;
+    Transform.y[entity] = y;
+    Transform.z[entity] = z;
+    Transform.rotY[entity] = rotY;
+    return entity;
+  } catch (error) {
+    console.error(`Error adding Transform component to entity ${entity}:`, error);
+    throw error;
+  }
 }
 
 /**
  * Helper function to add a Velocity component to an entity
  */
 export function addVelocity(
-  entity: number, 
-  dx = 0, 
-  dy = 0, 
+  entity: number,
+  dx = 0,
+  dy = 0,
   dz = 0
 ) {
-  addComponent(Velocity, entity);
-  Velocity.dx[entity] = dx;
-  Velocity.dy[entity] = dy;
-  Velocity.dz[entity] = dz;
-  return entity;
+  if (entity === undefined) {
+    throw new Error('Cannot add Velocity component to undefined entity');
+  }
+
+  try {
+    addComponent(Velocity, entity);
+    Velocity.dx[entity] = dx;
+    Velocity.dy[entity] = dy;
+    Velocity.dz[entity] = dz;
+    return entity;
+  } catch (error) {
+    console.error(`Error adding Velocity component to entity ${entity}:`, error);
+    throw error;
+  }
 }
 
 /**
  * Helper function to add a Collider component to an entity
  */
 export function addCollider(
-  entity: number, 
-  radius = 0.5, 
-  height = 0, 
+  entity: number,
+  radius = 0.5,
+  height = 0,
   flags = CollisionFlags.OBSTACLE
 ) {
-  addComponent(Collider, entity);
-  Collider.radius[entity] = radius;
-  Collider.height[entity] = height;
-  Collider.flags[entity] = flags;
-  return entity;
+  if (entity === undefined) {
+    throw new Error('Cannot add Collider component to undefined entity');
+  }
+
+  try {
+    addComponent(Collider, entity);
+    Collider.radius[entity] = radius;
+    Collider.height[entity] = height;
+    Collider.flags[entity] = flags;
+    return entity;
+  } catch (error) {
+    console.error(`Error adding Collider component to entity ${entity}:`, error);
+    throw error;
+  }
 }
 
 /**
  * Helper function to add a Renderable component to an entity
  */
 export function addRenderable(
-  entity: number, 
-  meshType = 0, 
+  entity: number,
+  meshType = 0,
   materialType = 0
 ) {
-  addComponent(Renderable, entity);
-  Renderable.meshType[entity] = meshType;
-  Renderable.materialType[entity] = materialType;
-  return entity;
+  if (entity === undefined) {
+    throw new Error('Cannot add Renderable component to undefined entity');
+  }
+
+  try {
+    addComponent(Renderable, entity);
+    Renderable.meshType[entity] = meshType;
+    Renderable.materialType[entity] = materialType;
+    return entity;
+  } catch (error) {
+    console.error(`Error adding Renderable component to entity ${entity}:`, error);
+    throw error;
+  }
 }

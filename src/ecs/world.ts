@@ -1,11 +1,14 @@
-import { 
-  createWorld, 
-  addEntity, 
-  removeEntity, 
-  IWorld,
+import * as bitecs from 'bitecs';
+
+const {
+  createWorld,
+  addEntity,
+  removeEntity,
   pipe,
   defineQuery
-} from 'bitecs';
+} = bitecs;
+
+type IWorld = ReturnType<typeof createWorld>;
 
 /**
  * The ECS world instance
@@ -26,18 +29,18 @@ export function initWorld(): IWorld {
   if (world) {
     console.warn('ECS world already initialized, resetting');
   }
-  
+
   world = createWorld();
-  
+
   // Add a reference to the entities to delete
   // This is not a standard bitecs feature, but it's useful for deferred deletion
   (world as any).entitiesToDelete = entitiesToDelete;
-  
+
   // Expose for debugging in development
   if (import.meta.env.DEV) {
     (window as any).__ecsWorld = world;
   }
-  
+
   return world;
 }
 
@@ -66,7 +69,14 @@ export function resetWorld(): void {
  * @returns The entity ID
  */
 export function createEntity(): number {
-  return addEntity(getWorld());
+  const world = getWorld();
+  const entity = addEntity(world);
+
+  if (entity === undefined) {
+    throw new Error('Failed to create entity. Entity is undefined.');
+  }
+
+  return entity;
 }
 
 /**
@@ -83,11 +93,11 @@ export function scheduleEntityForDeletion(entity: number): void {
  */
 export function processEntityDeletions(): void {
   const currentWorld = getWorld();
-  
+
   for (const entity of entitiesToDelete) {
     removeEntity(currentWorld, entity);
   }
-  
+
   // Clear the array for the next frame
   entitiesToDelete.length = 0;
 }
@@ -102,10 +112,10 @@ export function createPipeline(systems: Array<(world: IWorld, dt: number) => voi
     for (const system of systems) {
       system(world, dt);
     }
-    
+
     // Process entity deletions at the end of the frame
     processEntityDeletions();
-    
+
     return world;
   };
 }

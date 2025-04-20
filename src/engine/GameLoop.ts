@@ -24,6 +24,9 @@ const LOG_INTERVAL = 1000; // Log every 1 second
 // Debug visualization
 let showColliders = false;
 
+// ECS integration
+let ecsInitialized = false;
+
 /**
  * Initialize the game engine
  */
@@ -47,11 +50,19 @@ export function initGameEngine() {
   // Initialize aim indicator
   initAimIndicator();
 
-  // Initialize ECS system
-  initECS();
+  // Initialize ECS system (wrapped in try-catch to allow the game to run even if ECS fails)
+  try {
+    console.log('Initializing ECS system...');
+    initECS();
 
-  // Create test obstacles in the ECS world
-  createTestObstacles();
+    // Create test obstacles in the ECS world
+    createTestObstacles();
+    console.log('ECS system initialized successfully');
+    ecsInitialized = true;
+  } catch (error) {
+    console.error('Failed to initialize ECS system:', error);
+    console.warn('Game will run without ECS functionality');
+  }
 
   // Start the game loop
   isRunning = true;
@@ -158,8 +169,17 @@ function fixedUpdate(dt: number) {
   const playerPos = player.getPosition();
   renderer.camera.setTarget(playerPos.x, playerPos.y, playerPos.z);
 
-  // Update ECS systems
-  updateECS(dt);
+  // Update ECS systems if initialized
+  if (ecsInitialized) {
+    try {
+      updateECS(dt);
+    } catch (error) {
+      // Only log occasionally to avoid console spam
+      if (Math.random() < 0.01) {
+        console.error('Error updating ECS:', error);
+      }
+    }
+  }
 }
 
 /**
