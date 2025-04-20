@@ -1374,6 +1374,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.7.0"
     "@typescript-eslint/parser": "npm:^6.7.0"
     "@vitejs/plugin-vue": "npm:^4.3.4"
+    bitecs: "npm:^0.3.40"
     eslint: "npm:^8.49.0"
     eslint-plugin-vue: "npm:^9.17.0"
     husky: "npm:^8.0.3"
@@ -1396,6 +1397,13 @@ __metadata:
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
   checksum: 10c0/9308baf0a7e4838a82bbfd11e01b1cb0f0cf2893bc1676c27c2a8c0e70cbae1c59120c3268517a8ae7fb6376b4639ef81ca22582611dbee4ed28df945134aaee
+  languageName: node
+  linkType: hard
+
+"bitecs@npm:^0.3.40":
+  version: 0.3.40
+  resolution: "bitecs@npm:0.3.40"
+  checksum: 10c0/bb83221c63f850b7ab0d34176531f78b66b136434b85754040d4bc335c90702fb51c387c4983de5aa1dae24db7d523d3b6d32e25019ceaa9d77feed9f85cbe39
   languageName: node
   linkType: hard
 

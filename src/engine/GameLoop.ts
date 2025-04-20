@@ -5,6 +5,7 @@ import { inputManager, InputAction } from './InputManager';
 import { initPlayer, getPlayer } from './Player';
 import { initAimIndicator, getAimIndicator } from './AimIndicator';
 import { initCollisionSystem, getCollisionSystem } from './CollisionSystem';
+import { initECS, updateECS, createTestObstacles } from '../ecs/integration';
 
 // Game loop configuration
 const FIXED_TIMESTEP = 1 / 60; // 60 updates per second
@@ -45,6 +46,12 @@ export function initGameEngine() {
 
   // Initialize aim indicator
   initAimIndicator();
+
+  // Initialize ECS system
+  initECS();
+
+  // Create test obstacles in the ECS world
+  createTestObstacles();
 
   // Start the game loop
   isRunning = true;
@@ -150,6 +157,9 @@ function fixedUpdate(dt: number) {
   const renderer = getRenderer();
   const playerPos = player.getPosition();
   renderer.camera.setTarget(playerPos.x, playerPos.y, playerPos.z);
+
+  // Update ECS systems
+  updateECS(dt);
 }
 
 /**

@@ -36,7 +36,7 @@
 | **Camera Follow & Rotation** | ✅ Complete | Camera follows player + middle mouse button for free rotation |
 | **Physics & Continuous Collision** | ✅ Complete | Basic physics with capsule vs. AABB collision detection and sliding |
 | **World Layout** | ✅ Complete | Simple square room with wall perimeter instead of checkerboard pattern |
-| **ECS Integration** | ⏳ Planned | Will implement after collision system |
+| **ECS Integration** | ✅ Complete | Basic ECS with Transform, Velocity, Collider, and Renderable components |
 
 ---
 
@@ -89,6 +89,7 @@
 - **2025-04-19:** Implemented collision detection system with capsule vs. AABB collisions and sliding
 - **2025-04-20:** Improved collision system to handle corner cases and added debug visualization (toggle with C key)
 - **2025-04-20:** Enhanced test room with two chambers connected by a doorway and added standalone obstacle tiles
+- **2025-04-20:** Implemented basic ECS integration with bitecs library, including Transform, Velocity, Collider, and Renderable components
 
 ---
 
