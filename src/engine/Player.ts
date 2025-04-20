@@ -61,21 +61,32 @@ export class Player {
   }
 
   /**
-   * Transform input axes based on fixed camera orientation
-   * Camera is locked to North (-Z axis)
+   * Transform input axes based on camera orientation
+   * W always moves in the direction the camera is facing
    */
   private transformInputAxes(inputX: number, inputY: number): { x: number, z: number } {
-    // For our coordinate system (North = -Z, East = +X):
-    // - W (inputY = 1) moves North (-Z)
-    // - S (inputY = -1) moves South (+Z)
-    // - A (inputX = -1) moves West (-X)
-    // - D (inputX = 1) moves East (+X)
+    // Get the camera rotation angle
+    const renderer = getRenderer();
+    const cameraAngle = renderer.camera.getRotationAngle();
 
-    // Since camera is fixed pointing North (-Z):
-    // Forward/backward (W/S) maps directly to Z axis (negative for forward)
-    // Left/right (A/D) maps directly to X axis
-    const worldX = inputX;
-    const worldZ = inputY; // Positive inputY (W key) should move North (-Z)
+    // Rotate the input axes based on camera angle
+    // In our input system:
+    // - W (inputY = 1) should move forward in camera direction
+    // - S (inputY = -1) should move backward from camera direction
+    // - A (inputX = -1) should move left relative to camera direction
+    // - D (inputX = 1) should move right relative to camera direction
+
+    // Calculate rotated axes
+    const cosAngle = Math.cos(cameraAngle);
+    const sinAngle = Math.sin(cameraAngle);
+
+    // Apply rotation matrix to input axes
+    // For camera-relative movement, we need to rotate the input vector by the camera angle
+    // [ cos(θ) -sin(θ) ] [ inputX ]
+    // [ sin(θ)  cos(θ) ] [ -inputY ]
+    // Note: We negate inputY because forward is positive in input space but negative in world Z
+    const worldX = inputX * cosAngle - (-inputY) * sinAngle;
+    const worldZ = inputX * sinAngle + (-inputY) * cosAngle;
 
     return { x: worldX, z: worldZ };
   }
@@ -94,7 +105,7 @@ export class Player {
     this.acceleration.set(
       worldX * this.speed,
       0,
-      -worldZ * this.speed // Negative because North is -Z in Three.js
+      worldZ * this.speed // Already transformed to world coordinates
     );
 
     // Apply acceleration to velocity

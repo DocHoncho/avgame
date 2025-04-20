@@ -84,6 +84,7 @@
 - **2025-04-19:** Fixed movement direction and standardized on X/Z coordinates
 - **2025-04-19:** Added frame rate limiter to lock game at 60 FPS using the setTimeout + requestAnimationFrame pattern
 - **2025-04-19:** Added camera rotation with middle mouse button
+- **2025-04-19:** Updated player movement to be relative to camera direction (W always moves forward in camera direction)
 - **2025-04-19:** Fixed middle mouse button camera rotation and removed Q/E key rotation in favor of free rotation
 
 ---
