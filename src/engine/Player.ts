@@ -61,46 +61,35 @@ export class Player {
   }
 
   /**
-   * Transform input axes based on camera orientation
-   * W always moves in the direction the camera is facing
-   */
+ * Convert WASD axes into a world‑space X Z vector
+ * that is always relative to the current camera.
+ */
   private transformInputAxes(inputX: number, inputY: number): { x: number, z: number } {
-    // Get the camera rotation angle
     const renderer = getRenderer();
-    const cameraAngle = renderer.camera.getRotationAngle();
+    const cam = renderer.camera.camera;           // THREE.PerspectiveCamera
 
-    // Rotate the input axes based on camera angle
-    // In our input system:
-    // - W (inputY = 1) should move forward in camera direction
-    // - S (inputY = -1) should move backward from camera direction
-    // - A (inputX = -1) should move left relative to camera direction
-    // - D (inputX = 1) should move right relative to camera direction
+    // ----- 1. forward vector (where the camera looks) -----
+    const forward = new THREE.Vector3();
+    cam.getWorldDirection(forward);    // returns a UNIT vector
+    forward.y = 0;                     // flatten to ground plane
+    forward.normalize();               // re‑normalise after y‑kill
 
-    // Calculate rotated axes
-    const cos = Math.cos(cameraAngle);
-    const sin = Math.sin(cameraAngle);
+    // ----- 2. right vector  (90° clockwise from forward) -----
+    // right = forward × worldUp
+    const right = new THREE.Vector3()
+      .copy(forward)
+      .cross(new THREE.Vector3(0, 1, 0))   // (x,z) → (x,0,z)
+      .normalize();
 
-    // Apply rotation matrix to input axes
-    // For camera-relative movement, we need to rotate the input vector by the camera angle
-    // [ cos(θ) -sin(θ) ] [ inputX ]
-    // [ sin(θ)  cos(θ) ] [ inputY ]
-    // Note: We use positive inputY because in Three.js:
-    // - Forward is in the direction the camera is facing
-    // - Right is 90 degrees clockwise from forward
-    const worldX = inputX * (-sin) - inputY * cos; // X component = Rx*inputX + Fx*inputY
-    const worldZ = inputX *  cos   - inputY * sin; // Z component = Rz*inputX + Fz*inputY
+    // ----- 3. combine with input axes -----
+    // W/S drive along forward,  A/D along right
+    const move = right.multiplyScalar(inputX)     // D = +1, A = –1
+      .add(forward.multiplyScalar(inputY)); // W = +1, S = –1
 
-    // Debug log for movement directions (only when there's actual input)
-    if (inputX !== 0 || inputY !== 0) {
-      // Only log occasionally to avoid spam
-      if (Math.random() < 0.05) { // Log roughly 5% of the time when moving
-        console.log(`Input: (${inputX.toFixed(2)}, ${inputY.toFixed(2)}), ` +
-                    `Camera Angle: ${(cameraAngle * 180 / Math.PI).toFixed(0)}°, ` +
-                    `World Movement: (${worldX.toFixed(2)}, ${worldZ.toFixed(2)})`);
-      }
-    }
+    // Stop diagonals from being √2 faster
+    if (move.lengthSq() > 1) move.normalize();
 
-    return { x: worldX, z: worldZ };
+    return { x: move.x, z: move.z };
   }
 
   /**
