@@ -4,6 +4,7 @@ import { useAppStore } from '../state/appStore';
 import { inputManager, InputAction } from './InputManager';
 import { initPlayer, getPlayer } from './Player';
 import { initAimIndicator, getAimIndicator } from './AimIndicator';
+import { initCollisionSystem, getCollisionSystem } from './CollisionSystem';
 
 // Game loop configuration
 const FIXED_TIMESTEP = 1 / 60; // 60 updates per second
@@ -24,7 +25,17 @@ const LOG_INTERVAL = 1000; // Log every 1 second
  */
 export function initGameEngine() {
   // Initialize renderer
-  initRenderer();
+  const renderer = initRenderer();
+
+  // Initialize collision system
+  const collisionSystem = initCollisionSystem();
+
+  // Generate wall colliders from the renderer's wall instances
+  if (renderer.wallInstances) {
+    collisionSystem.generateWallColliders(renderer.wallInstances, renderer.getTileSize());
+  } else {
+    console.warn('No wall instances found for collision generation');
+  }
 
   // Initialize player
   initPlayer();

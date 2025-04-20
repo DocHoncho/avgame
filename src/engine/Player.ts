@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { inputManager } from './InputManager';
 import { getRenderer } from './Renderer';
+import { getCollisionSystem, Capsule, AABB } from './CollisionSystem';
 
 /**
  * Player class
@@ -133,8 +134,22 @@ export class Player {
       this.velocity.normalize().multiplyScalar(this.maxSpeed);
     }
 
+    // Calculate the next position
+    const nextPosition = this.position.clone().add(this.velocity.clone().multiplyScalar(deltaTime));
+
+    // Check for collisions
+    const collisionResult = this.checkCollisionAtPosition(nextPosition);
+
+    if (collisionResult.collision) {
+      // Collision detected, use the modified velocity
+      this.velocity = collisionResult.newVelocity;
+
+      // Recalculate the next position with the modified velocity
+      nextPosition.copy(this.position).add(this.velocity.clone().multiplyScalar(deltaTime));
+    }
+
     // Update position
-    this.position.add(this.velocity.clone().multiplyScalar(deltaTime));
+    this.position.copy(nextPosition);
 
     // Update mesh position
     this.mesh.position.copy(this.position);
@@ -158,11 +173,51 @@ export class Player {
   }
 
   /**
+   * Create a capsule collider for the player at the specified position
+   */
+  private createCapsuleCollider(position: THREE.Vector3): Capsule {
+    return {
+      start: new THREE.Vector3(position.x, position.y - this.height / 2 + this.radius, position.z),
+      end: new THREE.Vector3(position.x, position.y + this.height / 2 - this.radius, position.z),
+      radius: this.radius
+    };
+  }
+
+  /**
+   * Check for collisions at the specified position
+   * @returns Object containing collision result and modified velocity
+   */
+  private checkCollisionAtPosition(position: THREE.Vector3): { collision: boolean, newVelocity: THREE.Vector3 } {
+    // Get the collision system
+    const collisionSystem = getCollisionSystem();
+
+    // Create a capsule collider at the specified position
+    const capsule = this.createCapsuleCollider(position);
+
+    // Check for collisions
+    const collider = collisionSystem.checkCapsuleCollision(capsule);
+
+    if (collider) {
+      // Collision detected, resolve it
+      const newVelocity = collisionSystem.resolveCollision(capsule, this.velocity, collider);
+      return { collision: true, newVelocity };
+    }
+
+    // No collision
+    return { collision: false, newVelocity: this.velocity };
+  }
+
+  /**
    * Check collision with other objects
    */
   public checkCollision(objects: THREE.Object3D[]): boolean {
-    // This will be implemented when we add the collision system
-    return false;
+    // Create a capsule collider at the current position
+    const capsule = this.createCapsuleCollider(this.position);
+
+    // Check for collisions with static colliders
+    const collider = getCollisionSystem().checkCapsuleCollision(capsule);
+
+    return collider !== null;
   }
 }
 

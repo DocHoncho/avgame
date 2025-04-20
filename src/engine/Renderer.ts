@@ -21,7 +21,7 @@ export class Renderer {
 
   // Tile grid
   private floorInstances: THREE.InstancedMesh | null = null;
-  private wallInstances: THREE.InstancedMesh | null = null;
+  public wallInstances: THREE.InstancedMesh | null = null; // Public for collision system
   private tileSize = 1.0;
   private roomSize = 12; // 12x12 room with 1-tile wall border
 
@@ -225,6 +225,13 @@ export class Renderer {
    */
   getStats() {
     return this.stats;
+  }
+
+  /**
+   * Get the tile size
+   */
+  getTileSize(): number {
+    return this.tileSize;
   }
 }
 

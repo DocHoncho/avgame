@@ -34,7 +34,7 @@
 | **Player Movement** | ✅ Complete | Basic player capsule with physics-based movement |
 | **Aim Indicator** | ✅ Complete | Visual indicator showing aim direction |
 | **Camera Follow & Rotation** | ✅ Complete | Camera follows player + middle mouse button for free rotation |
-| **Physics & Continuous Collision** | 🔄 In Progress | Basic physics implemented, collision detection in progress |
+| **Physics & Continuous Collision** | ✅ Complete | Basic physics with capsule vs. AABB collision detection and sliding |
 | **World Layout** | ✅ Complete | Simple square room with wall perimeter instead of checkerboard pattern |
 | **ECS Integration** | ⏳ Planned | Will implement after collision system |
 
@@ -86,7 +86,8 @@
 - **2025-04-19:** Added camera rotation with middle mouse button
 - **2025-04-19:** Updated player movement to be relative to camera direction (W always moves forward in camera direction)
 - **2025-04-19:** Fixed middle mouse button camera rotation and removed Q/E key rotation in favor of free rotation
+- **2025-04-19:** Implemented collision detection system with capsule vs. AABB collisions and sliding
 
 ---
 
-*Last updated: 2025-04-19*
+*Last updated: 2025-04-20*
