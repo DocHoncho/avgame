@@ -15,6 +15,10 @@ let isRunning = false;
 let lastTime = 0;
 let accumulator = 0;
 
+// Debug logging control
+let lastLogTime = 0;
+const LOG_INTERVAL = 1000; // Log every 1 second
+
 /**
  * Initialize the game engine
  */
@@ -154,8 +158,18 @@ function updateDevOverlay(stats: any) {
   const angleDegrees = ((cameraAngle * 180 / Math.PI) % 360 + 360) % 360;
 
   // Calculate forward vector based on camera angle
+  // In Three.js, with camera angle 0, we're looking at +X (East)
+  // Forward vector points in the direction the camera is facing
   const forwardX = Math.cos(cameraAngle);
   const forwardZ = Math.sin(cameraAngle);
+
+  // Debug log for camera angle and forward vector (throttled)
+  const now = Date.now();
+  if (now - lastLogTime > LOG_INTERVAL) {
+    console.log(`Camera Angle: ${angleDegrees.toFixed(0)}° (${cameraAngle.toFixed(2)} radians), ` +
+                `Forward Vector: (${forwardX.toFixed(2)}, ${forwardZ.toFixed(2)})`);
+    lastLogTime = now;
+  }
 
   window.dispatchEvent(new CustomEvent('camera-angle-update', {
     detail: {

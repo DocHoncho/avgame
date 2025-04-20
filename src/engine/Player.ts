@@ -90,11 +90,14 @@ export class Player {
     const worldX = inputX * cosAngle - inputY * sinAngle;
     const worldZ = inputX * sinAngle + inputY * cosAngle;
 
-    // Debug log for movement directions
+    // Debug log for movement directions (only when there's actual input)
     if (inputX !== 0 || inputY !== 0) {
-      console.log(`Input: (${inputX.toFixed(2)}, ${inputY.toFixed(2)}), ` +
-                  `Camera Angle: ${(cameraAngle * 180 / Math.PI).toFixed(0)}°, ` +
-                  `World Movement: (${worldX.toFixed(2)}, ${worldZ.toFixed(2)})`);
+      // Only log occasionally to avoid spam
+      if (Math.random() < 0.05) { // Log roughly 5% of the time when moving
+        console.log(`Input: (${inputX.toFixed(2)}, ${inputY.toFixed(2)}), ` +
+                    `Camera Angle: ${(cameraAngle * 180 / Math.PI).toFixed(0)}°, ` +
+                    `World Movement: (${worldX.toFixed(2)}, ${worldZ.toFixed(2)})`);
+      }
     }
 
     return { x: worldX, z: worldZ };

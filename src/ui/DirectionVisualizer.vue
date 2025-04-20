@@ -83,10 +83,17 @@ const sDirection = computed(() => (cameraAngleDegrees.value + 180) % 360);
 const dDirection = computed(() => (cameraAngleDegrees.value + 90) % 360);
 
 // Debug log for direction visualization
+let lastLogTime = 0;
+const LOG_INTERVAL = 1000; // Log every 1 second
+
 const logDirections = () => {
-  console.log(`Direction Visualizer - Camera: ${cameraAngleDegrees.value}°, ` +
-              `W: ${wDirection.value}°, A: ${aDirection.value}°, ` +
-              `S: ${sDirection.value}°, D: ${dDirection.value}°`);
+  const now = Date.now();
+  if (now - lastLogTime > LOG_INTERVAL) {
+    console.log(`Direction Visualizer - Camera: ${cameraAngleDegrees.value}°, ` +
+                `W: ${wDirection.value}°, A: ${aDirection.value}°, ` +
+                `S: ${sDirection.value}°, D: ${dDirection.value}°`);
+    lastLogTime = now;
+  }
 };
 
 // Update camera angle and forward vector from event
