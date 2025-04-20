@@ -27,8 +27,8 @@ export class Player {
 
   constructor() {
     // Initialize position and physics vectors
-    // Start at the center of the room
-    this.position = new THREE.Vector3(0, 0.9, 0);
+    // Start in the north room
+    this.position = new THREE.Vector3(0, 0.9, -3);
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.acceleration = new THREE.Vector3(0, 0, 0);
 

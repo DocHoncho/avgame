@@ -49,7 +49,8 @@ export class Renderer {
 
     // Create camera
     this.camera = new IsoCamera(50, window.innerWidth / window.innerHeight);
-    this.camera.setTarget(this.roomSize / 2, 0, this.roomSize / 2);
+    // Set initial target to the north room where the player starts
+    this.camera.setTarget(0, 0, -3);
 
     // Set initial camera distance for better view
     this.camera.setDistance(18);
@@ -109,7 +110,10 @@ export class Renderer {
 
     // Calculate total tiles needed
     const totalFloorTiles = (this.roomSize - 2) * (this.roomSize - 2); // Interior floor
-    const totalWallTiles = (this.roomSize * this.roomSize) - totalFloorTiles; // Outer walls
+
+    // We'll add more walls for the divider and standalone obstacles
+    // Outer walls + divider wall + standalone obstacles
+    const totalWallTiles = (this.roomSize * 4 - 4) + (this.roomSize - 4) + 6; // Perimeter + divider + obstacles
 
     // Create instanced meshes
     this.floorInstances = new THREE.InstancedMesh(
@@ -150,8 +154,10 @@ export class Renderer {
       }
     }
 
-    // Place wall tiles (perimeter)
+    // Place wall tiles
     let wallIndex = 0;
+
+    // 1. Place perimeter walls
     for (let x = 0; x < this.roomSize; x++) {
       for (let z = 0; z < this.roomSize; z++) {
         // Only place walls on the perimeter
@@ -170,6 +176,54 @@ export class Renderer {
           wallIndex++;
         }
       }
+    }
+
+    // 2. Place divider wall with an opening in the middle
+    const middleZ = 0; // Z-coordinate for the divider wall
+    const openingSize = 3; // Size of the opening in tiles
+    const openingStart = Math.floor((this.roomSize - openingSize) / 2); // Start of the opening
+
+    for (let x = 1; x < this.roomSize - 1; x++) {
+      // Skip the opening in the middle
+      if (x >= openingStart && x < openingStart + openingSize) {
+        continue;
+      }
+
+      const posX = (x - this.roomSize / 2) * this.tileSize;
+      const posZ = middleZ;
+
+      matrix.setPosition(posX, 0.5, posZ);
+      this.wallInstances.setMatrixAt(wallIndex, matrix);
+
+      // Use a slightly different color for the divider
+      const dividerColor = new THREE.Color(0x00aaff);
+      this.wallInstances.setColorAt(wallIndex, dividerColor);
+
+      wallIndex++;
+    }
+
+    // 3. Place standalone obstacle tiles
+    const obstacles = [
+      // North room obstacles (2 tiles)
+      { x: -3, z: -3 },
+      { x: 3, z: -3 },
+
+      // South room obstacles (4 tiles in a square)
+      { x: -2, z: 3 },
+      { x: -1, z: 3 },
+      { x: -2, z: 4 },
+      { x: -1, z: 4 }
+    ];
+
+    for (const obstacle of obstacles) {
+      matrix.setPosition(obstacle.x, 0.5, obstacle.z);
+      this.wallInstances.setMatrixAt(wallIndex, matrix);
+
+      // Use a different color for obstacles
+      const obstacleColor = new THREE.Color(0x00cc88);
+      this.wallInstances.setColorAt(wallIndex, obstacleColor);
+
+      wallIndex++;
     }
 
     // Add instances to scene

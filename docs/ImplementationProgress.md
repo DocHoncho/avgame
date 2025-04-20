@@ -88,6 +88,7 @@
 - **2025-04-19:** Fixed middle mouse button camera rotation and removed Q/E key rotation in favor of free rotation
 - **2025-04-19:** Implemented collision detection system with capsule vs. AABB collisions and sliding
 - **2025-04-20:** Improved collision system to handle corner cases and added debug visualization (toggle with C key)
+- **2025-04-20:** Enhanced test room with two chambers connected by a doorway and added standalone obstacle tiles
 
 ---
 
