@@ -9,7 +9,6 @@ import { initAimIndicator, getAimIndicator } from './AimIndicator';
 const FIXED_TIMESTEP = 1 / 60; // 60 updates per second
 const MAX_FRAME_TIME = 0.25; // Maximum frame time to prevent spiral of death
 const TARGET_FPS = 60; // Target frame rate
-const FRAME_TIME = 1000 / TARGET_FPS; // Time per frame in ms
 
 // Game state
 let isRunning = false;
@@ -55,13 +54,23 @@ export function initGameEngine() {
 let frameId: number | null = null;
 
 /**
- * Main game loop
+ * Main game loop with frame rate limiting
  */
-function gameLoop(timestamp: number) {
+function gameLoop() {
   if (!isRunning) return;
 
-  // Calculate delta time
+  // Schedule the next frame first with our frame rate limiting
+  setTimeout(() => {
+    if (isRunning) {
+      frameId = requestAnimationFrame(gameLoop);
+    }
+  }, 1000 / TARGET_FPS);
+
+  // Get current time for this frame
+  const timestamp = performance.now();
   const now = timestamp / 1000; // Convert to seconds
+
+  // Calculate delta time
   const deltaTime = Math.min(now - lastTime, MAX_FRAME_TIME);
   lastTime = now;
 
@@ -76,26 +85,6 @@ function gameLoop(timestamp: number) {
 
   // Render with interpolation
   render(accumulator / FIXED_TIMESTEP);
-
-  // Calculate how long this frame took
-  const frameEndTime = performance.now();
-  const frameDuration = frameEndTime - timestamp;
-
-  // Calculate delay needed to maintain target frame rate
-  const delay = Math.max(0, FRAME_TIME - frameDuration);
-
-  // Schedule next frame with proper timing
-  if (isRunning) {
-    // Clear any existing frame request
-    if (frameId !== null) {
-      cancelAnimationFrame(frameId);
-    }
-
-    // Use setTimeout for frame limiting, then requestAnimationFrame for the actual rendering
-    setTimeout(() => {
-      frameId = requestAnimationFrame(gameLoop);
-    }, delay);
-  }
 }
 
 /**
@@ -195,6 +184,8 @@ export function resumeGame() {
     isRunning = true;
     const now = performance.now();
     lastTime = now / 1000;
-    frameId = requestAnimationFrame(gameLoop);
+    // Start the game loop without requestAnimationFrame
+    // since our gameLoop function handles its own scheduling
+    gameLoop();
   }
 }
