@@ -15,7 +15,7 @@ export class IsoCamera {
 
   // Camera position in spherical coordinates
   private distance = 20;
-  private rotationAngle = 0; // Initial angle - looking at +X (East)
+  private rotationAngle = Math.PI / 2;
   private elevationAngle = Math.PI / 6; // 30 degrees
 
   // Camera limits
@@ -101,8 +101,12 @@ export class IsoCamera {
     // Define the angles for each cardinal direction based on Three.js coordinates
     // North = PI/2 (looking at -Z), East = 0 (looking at +X)
     // South = 3PI/2 (looking at +Z), West = PI (looking at -X)
-    const angles = [Math.PI/2, 0, 3*Math.PI/2, Math.PI];
-    this.rotationAngle = angles[index % 4];
+    const angles = [
+      Math.PI / 2,   // 0 North  (‑Z)
+      Math.PI,       // 1 East   (+X)
+      3 * Math.PI / 2,//2 South  (+Z)
+      0              // 3 West   (‑X)
+    ];    this.rotationAngle = angles[index % 4];
     this.updatePosition();
 
     // Debug log for camera direction

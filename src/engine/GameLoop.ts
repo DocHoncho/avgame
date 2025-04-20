@@ -160,8 +160,8 @@ function updateDevOverlay(stats: any) {
   // Calculate forward vector based on camera angle
   // In Three.js, with camera angle 0, we're looking at +X (East)
   // Forward vector points in the direction the camera is facing
-  const forwardX = Math.cos(cameraAngle);
-  const forwardZ = Math.sin(cameraAngle);
+  const forwardX = -Math.cos(cameraAngle);
+  const forwardZ = -Math.sin(cameraAngle);
 
   // Debug log for camera angle and forward vector (throttled)
   const now = Date.now();

@@ -77,8 +77,8 @@ export class Player {
     // - D (inputX = 1) should move right relative to camera direction
 
     // Calculate rotated axes
-    const cosAngle = Math.cos(cameraAngle);
-    const sinAngle = Math.sin(cameraAngle);
+    const cos = Math.cos(cameraAngle);
+    const sin = Math.sin(cameraAngle);
 
     // Apply rotation matrix to input axes
     // For camera-relative movement, we need to rotate the input vector by the camera angle
@@ -87,8 +87,8 @@ export class Player {
     // Note: We use positive inputY because in Three.js:
     // - Forward is in the direction the camera is facing
     // - Right is 90 degrees clockwise from forward
-    const worldX = inputX * cosAngle - inputY * sinAngle;
-    const worldZ = inputX * sinAngle + inputY * cosAngle;
+    const worldX = inputX * (-sin) - inputY * cos; // X component = Rx*inputX + Fx*inputY
+    const worldZ = inputX *  cos   - inputY * sin; // Z component = Rz*inputX + Fz*inputY
 
     // Debug log for movement directions (only when there's actual input)
     if (inputX !== 0 || inputY !== 0) {
