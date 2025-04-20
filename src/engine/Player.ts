@@ -89,6 +89,19 @@ export class Player {
     // Stop diagonals from being √2 faster
     if (move.lengthSq() > 1) move.normalize();
 
+    // Debug log for movement directions (only when there's actual input)
+    if (inputX !== 0 || inputY !== 0) {
+      // Only log occasionally to avoid spam
+      if (Math.random() < 0.05) { // Log roughly 5% of the time when moving
+        const cameraAngle = renderer.camera.getRotationAngle();
+        console.log(`Input: (${inputX.toFixed(2)}, ${inputY.toFixed(2)}), ` +
+                    `Camera Angle: ${(cameraAngle * 180 / Math.PI).toFixed(0)}°, ` +
+                    `Forward: (${forward.x.toFixed(2)}, ${forward.z.toFixed(2)}), ` +
+                    `Right: (${right.x.toFixed(2)}, ${right.z.toFixed(2)}), ` +
+                    `Movement: (${move.x.toFixed(2)}, ${move.z.toFixed(2)})`);
+      }
+    }
+
     return { x: move.x, z: move.z };
   }
 

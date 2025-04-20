@@ -157,11 +157,11 @@ function updateDevOverlay(stats: any) {
   // Convert radians to degrees and normalize to 0-360 range
   const angleDegrees = ((cameraAngle * 180 / Math.PI) % 360 + 360) % 360;
 
-  // Calculate forward vector based on camera angle
-  // In Three.js, with camera angle 0, we're looking at +X (East)
-  // Forward vector points in the direction the camera is facing
-  const forwardX = -Math.cos(cameraAngle);
-  const forwardZ = -Math.sin(cameraAngle);
+  // Get the forward vector directly from the camera
+  // This is more accurate than calculating it with trigonometry
+  const forward = renderer.camera.getForwardVector();
+  const forwardX = forward.x;
+  const forwardZ = forward.z;
 
   // Debug log for camera angle and forward vector (throttled)
   const now = Date.now();

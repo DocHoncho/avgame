@@ -53,6 +53,8 @@
     <div class="vector-info">
       <div>Forward Vector:</div>
       <div>X: {{ forwardX.toFixed(2) }}, Z: {{ forwardZ.toFixed(2) }}</div>
+      <div>Right Vector:</div>
+      <div>X: {{ rightX.toFixed(2) }}, Z: {{ rightZ.toFixed(2) }}</div>
     </div>
   </div>
 </template>
@@ -64,6 +66,8 @@ import { ref, onMounted, onUnmounted, computed } from 'vue';
 const cameraAngleDegrees = ref(0);
 const forwardX = ref(0);
 const forwardZ = ref(0);
+const rightX = ref(0);
+const rightZ = ref(0);
 
 // Computed properties for arrow rotations
 // Camera angle is directly from the event
@@ -91,7 +95,9 @@ const logDirections = () => {
   if (now - lastLogTime > LOG_INTERVAL) {
     console.log(`Direction Visualizer - Camera: ${cameraAngleDegrees.value}°, ` +
                 `W: ${wDirection.value}°, A: ${aDirection.value}°, ` +
-                `S: ${sDirection.value}°, D: ${dDirection.value}°`);
+                `S: ${sDirection.value}°, D: ${dDirection.value}°, ` +
+                `Forward: (${forwardX.value.toFixed(2)}, ${forwardZ.value.toFixed(2)}), ` +
+                `Right: (${rightX.value.toFixed(2)}, ${rightZ.value.toFixed(2)})`);
     lastLogTime = now;
   }
 };
@@ -101,6 +107,11 @@ const updateCameraAngle = (e: CustomEvent) => {
   cameraAngleDegrees.value = e.detail.angle;
   forwardX.value = e.detail.forwardX;
   forwardZ.value = e.detail.forwardZ;
+
+  // Calculate right vector from forward vector
+  // Right is perpendicular to forward in the XZ plane
+  rightX.value = forwardZ.value;
+  rightZ.value = -forwardX.value;
 
   // Log directions when camera angle changes
   logDirections();

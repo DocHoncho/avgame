@@ -94,6 +94,30 @@ export class IsoCamera {
   }
 
   /**
+   * Get the forward vector of the camera (in the XZ plane)
+   * @returns Normalized forward vector
+   */
+  getForwardVector(): THREE.Vector3 {
+    const forward = new THREE.Vector3();
+    this.camera.getWorldDirection(forward);
+    // Project onto XZ plane and normalize
+    forward.y = 0;
+    forward.normalize();
+    return forward;
+  }
+
+  /**
+   * Get the right vector of the camera (in the XZ plane)
+   * @returns Normalized right vector
+   */
+  getRightVector(): THREE.Vector3 {
+    const forward = this.getForwardVector();
+    // Right vector is perpendicular to forward in the XZ plane
+    const right = new THREE.Vector3(forward.z, 0, -forward.x);
+    return right;
+  }
+
+  /**
    * Snap to one of the four cardinal isometric views
    * @param index 0=North, 1=East, 2=South, 3=West
    */
