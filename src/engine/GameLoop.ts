@@ -91,6 +91,17 @@ function gameLoop() {
  * Fixed update step (game logic)
  */
 function fixedUpdate(dt: number) {
+  // Handle camera rotation with middle mouse button BEFORE updating input manager
+  // This ensures we get the mouse delta before it's reset
+  if (inputManager.isActionActive(InputAction.ROTATE_CAMERA)) {
+    const mouseDelta = inputManager.getMouseDelta();
+    // Rotate camera based on mouse X movement
+    // Negative multiplier to make left movement rotate counter-clockwise
+    const rotationSpeed = 0.005;
+    const renderer = getRenderer();
+    renderer.camera.rotate(-mouseDelta.x * rotationSpeed);
+  }
+
   // Update input manager
   inputManager.update(dt);
 
@@ -106,15 +117,6 @@ function fixedUpdate(dt: number) {
   const renderer = getRenderer();
   const playerPos = player.getPosition();
   renderer.camera.setTarget(playerPos.x, playerPos.y, playerPos.z);
-
-  // Handle camera rotation with middle mouse button
-  if (inputManager.isActionActive(InputAction.ROTATE_CAMERA)) {
-    const mouseDelta = inputManager.getMouseDelta();
-    // Rotate camera based on mouse X movement
-    // Negative multiplier to make left movement rotate counter-clockwise
-    const rotationSpeed = 0.005;
-    renderer.camera.rotate(-mouseDelta.x * rotationSpeed);
-  }
 }
 
 /**

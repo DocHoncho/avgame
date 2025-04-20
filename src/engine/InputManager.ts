@@ -12,8 +12,6 @@ export enum InputAction {
   MOVE_RIGHT = 'MOVE_RIGHT',
 
   // Camera
-  ROTATE_CAMERA_LEFT = 'ROTATE_CAMERA_LEFT',
-  ROTATE_CAMERA_RIGHT = 'ROTATE_CAMERA_RIGHT',
   ROTATE_CAMERA = 'ROTATE_CAMERA', // Middle mouse button for camera rotation
 
   // Actions
@@ -94,8 +92,6 @@ export class InputManager {
     'arrowleft': InputAction.MOVE_LEFT,
     'd': InputAction.MOVE_RIGHT,
     'arrowright': InputAction.MOVE_RIGHT,
-    'q': InputAction.ROTATE_CAMERA_LEFT,
-    'e': InputAction.ROTATE_CAMERA_RIGHT,
     ' ': InputAction.PRIMARY_ACTION,
     'shift': InputAction.SECONDARY_ACTION,
     'escape': InputAction.PAUSE,

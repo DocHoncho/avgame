@@ -33,7 +33,7 @@
 | **Mouse world-ray utility** | ✅ Complete | Implemented WorldRay class with plane intersection |
 | **Player Movement** | ✅ Complete | Basic player capsule with physics-based movement |
 | **Aim Indicator** | ✅ Complete | Visual indicator showing aim direction |
-| **Camera Follow & Snap Rotation** | ✅ Complete | Camera follows player + Q/E for 90° rotation |
+| **Camera Follow & Rotation** | ✅ Complete | Camera follows player + middle mouse button for free rotation |
 | **Physics & Continuous Collision** | 🔄 In Progress | Basic physics implemented, collision detection in progress |
 | **World Layout** | ✅ Complete | Simple square room with wall perimeter instead of checkerboard pattern |
 | **ECS Integration** | ⏳ Planned | Will implement after collision system |
@@ -84,6 +84,7 @@
 - **2025-04-19:** Fixed movement direction and standardized on X/Z coordinates
 - **2025-04-19:** Added frame rate limiter to lock game at 60 FPS using the setTimeout + requestAnimationFrame pattern
 - **2025-04-19:** Added camera rotation with middle mouse button
+- **2025-04-19:** Fixed middle mouse button camera rotation and removed Q/E key rotation in favor of free rotation
 
 ---
 
