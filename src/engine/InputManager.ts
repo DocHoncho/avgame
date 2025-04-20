@@ -41,7 +41,7 @@ interface InputAxes {
   moveX: number;
   moveY: number;
   aimX: number;
-  aimY: number;
+  aimZ: number;
 }
 
 /**
@@ -70,7 +70,7 @@ export class InputManager {
   // Input state tracking
   private keyState: { [key: string]: boolean } = {};
   private actionState: InputState = {};
-  private axes: InputAxes = { moveX: 0, moveY: 0, aimX: 0, aimY: 0 };
+  private axes: InputAxes = { moveX: 0, moveY: 0, aimX: 0, aimZ: 0 };
   private mouse: MouseState = {
     x: 0, y: 0,
     worldX: 0, worldY: 0, worldZ: 0,
@@ -144,18 +144,19 @@ export class InputManager {
   private handleKeyDown(event: KeyboardEvent): void {
     const key = event.key.toLowerCase();
 
-    // Always update key state, even if it's already down
-    // This helps with key repeat and makes movement more responsive
-    this.keyState[key] = true;
+    // Update key state
+    if (!this.keyState[key]) {
+      this.keyState[key] = true;
 
-    // Map to action if defined
-    const action = this.keyMap[key];
-    if (action) {
-      this.setActionState(action, true);
+      // Map to action if defined
+      const action = this.keyMap[key];
+      if (action) {
+        this.setActionState(action, true);
+      }
+
+      // Update movement axes
+      this.updateAxes();
     }
-
-    // Update movement axes
-    this.updateAxes();
   }
 
   /**
@@ -224,7 +225,7 @@ export class InputManager {
     });
 
     // Reset axes
-    this.axes = { moveX: 0, moveY: 0, aimX: 0, aimY: 0 };
+    this.axes = { moveX: 0, moveY: 0, aimX: 0, aimZ: 0 };
   }
 
   /**
@@ -260,11 +261,6 @@ export class InputManager {
       const length = Math.sqrt(this.axes.moveX * this.axes.moveX + this.axes.moveY * this.axes.moveY);
       this.axes.moveX /= length;
       this.axes.moveY /= length;
-    }
-
-    // Emit movement change event for immediate response
-    if (this.axes.moveX !== 0 || this.axes.moveY !== 0) {
-      eventBus.emit('input:movement', { x: this.axes.moveX, y: this.axes.moveY });
     }
   }
 
@@ -329,13 +325,13 @@ export class InputManager {
 
         // Calculate aim direction (for future use with projectiles)
         this.axes.aimX = worldPos.x - this.mouse.worldX;
-        this.axes.aimY = worldPos.z - this.mouse.worldZ;
+        this.axes.aimZ = worldPos.z - this.mouse.worldZ;
 
         // Normalize aim direction
-        const aimLength = Math.sqrt(this.axes.aimX * this.axes.aimX + this.axes.aimY * this.axes.aimY);
+        const aimLength = Math.sqrt(this.axes.aimX * this.axes.aimX + this.axes.aimZ * this.axes.aimZ);
         if (aimLength > 0) {
           this.axes.aimX /= aimLength;
-          this.axes.aimY /= aimLength;
+          this.axes.aimZ /= aimLength;
         }
       }
     }

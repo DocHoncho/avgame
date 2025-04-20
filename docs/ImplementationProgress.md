@@ -81,6 +81,7 @@
 - **2025-04-19:** Improved DevOverlay layout with player coordinates and repositioned elements
 - **2025-04-19:** Fixed movement controls to properly align with camera direction
 - **2025-04-19:** Simplified camera system by locking to North (-Z) orientation
+- **2025-04-19:** Fixed movement direction and standardized on X/Z coordinates
 
 ---
 

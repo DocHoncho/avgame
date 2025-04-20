@@ -75,7 +75,7 @@ export class Player {
     // Forward/backward (W/S) maps directly to Z axis (negative for forward)
     // Left/right (A/D) maps directly to X axis
     const worldX = inputX;
-    const worldZ = -inputY; // Negative because forward (North) is -Z
+    const worldZ = inputY; // Positive inputY (W key) should move North (-Z)
 
     return { x: worldX, z: worldZ };
   }
@@ -94,7 +94,7 @@ export class Player {
     this.acceleration.set(
       worldX * this.speed,
       0,
-      -worldZ * this.speed // Negative because forward is -z in Three.js
+      -worldZ * this.speed // Negative because North is -Z in Three.js
     );
 
     // Apply acceleration to velocity
