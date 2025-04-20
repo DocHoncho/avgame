@@ -5,7 +5,7 @@ const {
   addComponent
 } = bitecs;
 
-const { f32, u8, u16 } = bitecs.Types;
+const { f32, ui8, ui16 } = bitecs.Types;
 
 /**
  * Transform component
@@ -45,7 +45,7 @@ export const Collider = defineComponent({
   // Bit 1: Is trigger (doesn't block movement)
   // Bit 2: Is player (special handling)
   // Bit 3: Is obstacle (can be collided with)
-  flags: u8
+  flags: ui8
 });
 
 /**
@@ -54,9 +54,9 @@ export const Collider = defineComponent({
  */
 export const Renderable = defineComponent({
   // Mesh type (index into a mesh registry)
-  meshType: u16,
+  meshType: ui16,
   // Material type (index into a material registry)
-  materialType: u16
+  materialType: ui16
 });
 
 /**
@@ -73,6 +73,7 @@ export const CollisionFlags = {
  * Helper function to add a Transform component to an entity
  */
 export function addTransform(
+  world: any,
   entity: number,
   x = 0,
   y = 0,
@@ -84,11 +85,15 @@ export function addTransform(
   }
 
   try {
-    addComponent(Transform, entity);
+    // Add the component to the entity in the specified world
+    addComponent(world, Transform, entity);
+
+    // Set the component values
     Transform.x[entity] = x;
     Transform.y[entity] = y;
     Transform.z[entity] = z;
     Transform.rotY[entity] = rotY;
+
     return entity;
   } catch (error) {
     console.error(`Error adding Transform component to entity ${entity}:`, error);
@@ -100,6 +105,7 @@ export function addTransform(
  * Helper function to add a Velocity component to an entity
  */
 export function addVelocity(
+  world: any,
   entity: number,
   dx = 0,
   dy = 0,
@@ -110,10 +116,14 @@ export function addVelocity(
   }
 
   try {
-    addComponent(Velocity, entity);
+    // Add the component to the entity in the specified world
+    addComponent(world, Velocity, entity);
+
+    // Set the component values
     Velocity.dx[entity] = dx;
     Velocity.dy[entity] = dy;
     Velocity.dz[entity] = dz;
+
     return entity;
   } catch (error) {
     console.error(`Error adding Velocity component to entity ${entity}:`, error);
@@ -125,6 +135,7 @@ export function addVelocity(
  * Helper function to add a Collider component to an entity
  */
 export function addCollider(
+  world: any,
   entity: number,
   radius = 0.5,
   height = 0,
@@ -135,10 +146,14 @@ export function addCollider(
   }
 
   try {
-    addComponent(Collider, entity);
+    // Add the component to the entity in the specified world
+    addComponent(world, Collider, entity);
+
+    // Set the component values
     Collider.radius[entity] = radius;
     Collider.height[entity] = height;
     Collider.flags[entity] = flags;
+
     return entity;
   } catch (error) {
     console.error(`Error adding Collider component to entity ${entity}:`, error);
@@ -150,6 +165,7 @@ export function addCollider(
  * Helper function to add a Renderable component to an entity
  */
 export function addRenderable(
+  world: any,
   entity: number,
   meshType = 0,
   materialType = 0
@@ -159,9 +175,13 @@ export function addRenderable(
   }
 
   try {
-    addComponent(Renderable, entity);
+    // Add the component to the entity in the specified world
+    addComponent(world, Renderable, entity);
+
+    // Set the component values
     Renderable.meshType[entity] = meshType;
     Renderable.materialType[entity] = materialType;
+
     return entity;
   } catch (error) {
     console.error(`Error adding Renderable component to entity ${entity}:`, error);

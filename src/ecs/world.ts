@@ -70,13 +70,23 @@ export function resetWorld(): void {
  */
 export function createEntity(): number {
   const world = getWorld();
-  const entity = addEntity(world);
 
-  if (entity === undefined) {
-    throw new Error('Failed to create entity. Entity is undefined.');
+  try {
+    // In bitecs, addEntity returns the entity ID
+    const eid = addEntity(world);
+
+    // Debug log
+    console.log(`Created entity with ID: ${eid}`);
+
+    if (eid === undefined) {
+      throw new Error('Failed to create entity. Entity is undefined.');
+    }
+
+    return eid;
+  } catch (error) {
+    console.error('Error creating entity:', error);
+    throw error;
   }
-
-  return entity;
 }
 
 /**
